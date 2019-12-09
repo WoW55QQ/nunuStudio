@@ -207,17 +207,6 @@ function EditorSettingsTab(parent, closeable, container, index)
 	this.form.add(this.navigation);
 	this.form.nextRow();
 
-	//Invert navigation
-	this.form.addText("Invert Vertical");
-	this.invertNavigation = new CheckBox(this.form);
-	this.invertNavigation.size.set(18, 18);
-	this.invertNavigation.setOnChange(function()
-	{
-		Editor.settings.editor.invertNavigation = self.invertNavigation.getValue();
-	});
-	this.form.add(this.invertNavigation);
-	this.form.nextRow();
-
 	//Mouse look sensitivity
 	this.form.addText("Mouse look");
 	this.mouseLookSensitivity = new Slider(this.form);
@@ -387,7 +376,6 @@ EditorSettingsTab.prototype.activate = function()
 	//Navigation
 	this.lockMouse.setValue(Editor.settings.editor.lockMouse);
 	this.navigation.setValue(Editor.settings.editor.navigation);
-	this.invertNavigation.setValue(Editor.settings.editor.invertNavigation);
 	this.keyboardNavigation.setValue(Editor.settings.editor.keyboardNavigation);
 	this.keyboardNavigationSpeed.setValue(Editor.settings.editor.keyboardNavigationSpeed);
 	this.mouseLookSensitivity.setValue(Editor.settings.editor.mouseLookSensitivity);

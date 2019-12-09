@@ -8,8 +8,7 @@
  * @class SceneEditor
  * @extends {TabElement}
  */
-function SceneEditor(parent, closeable, container, index)
-{
+function SceneEditor(parent, closeable, container, index) {
 	TabElement.call(this, parent, closeable, container, index, Locale.scene, Global.FILE_PATH + "icons/misc/scene.png");
 
 	var self = this;
@@ -21,16 +20,14 @@ function SceneEditor(parent, closeable, container, index)
 	 * @type {RendererCanvas}
 	 */
 	this.canvas = new RendererCanvas(this, Editor.getRendererConfig());
-	this.canvas.resetCanvas = function()
-	{
+	this.canvas.resetCanvas = function () {
 		RendererCanvas.prototype.resetCanvas.call(this);
 
 		self.transform.setCanvas(this.canvas);
 		self.mouse.setCanvas(this.canvas);
 
 		this.canvas.ondragover = Element.preventDefault;
-		this.canvas.ondrop = function(event)
-		{
+		this.canvas.ondrop = function (event) {
 			event.preventDefault();
 
 			var uuid = event.dataTransfer.getData("uuid");
@@ -46,8 +43,7 @@ function SceneEditor(parent, closeable, container, index)
 			var intersections = self.raycaster.intersectObjects(self.scene.children, true);
 
 			//Auxiliar method to copy details from a object to a destination
-			function copyDetails(destination, object)
-			{
+			function copyDetails(destination, object) {
 				destination.name = object.name;
 				destination.visible = object.visible;
 				destination.castShadow = object.castShadow;
@@ -61,149 +57,117 @@ function SceneEditor(parent, closeable, container, index)
 			}
 
 			//Auxiliar method to attach textures to objects
-			function attachTexture(texture, object)
-			{
+			function attachTexture(texture, object) {
 				var material = null;
-				if(object instanceof THREE.Mesh || object instanceof THREE.SkinnedMesh)
-				{
-					material = new THREE.MeshStandardMaterial({map:texture, color:0xffffff, roughness: 0.6, metalness: 0.2});
+				if (object instanceof THREE.Mesh || object instanceof THREE.SkinnedMesh) {
+					material = new THREE.MeshStandardMaterial({ map: texture, color: 0xffffff, roughness: 0.6, metalness: 0.2 });
 					material.name = texture.name;
 				}
-				else if(object instanceof THREE.Line)
-				{
-					material = new THREE.LineBasicMaterial({color:0xffffff});
+				else if (object instanceof THREE.Line) {
+					material = new THREE.LineBasicMaterial({ color: 0xffffff });
 					material.name = texture.name;
 				}
-				else if(object instanceof THREE.Points)
-				{
-					material = new THREE.PointsMaterial({map:texture, color:0xffffff});
+				else if (object instanceof THREE.Points) {
+					material = new THREE.PointsMaterial({ map: texture, color: 0xffffff });
 					material.name = texture.name;
 				}
-				else if(object instanceof THREE.Sprite)
-				{
-					material = new THREE.SpriteMaterial({map:texture, color:0xffffff});
+				else if (object instanceof THREE.Sprite) {
+					material = new THREE.SpriteMaterial({ map: texture, color: 0xffffff });
 					material.name = texture.name;
 				}
 
-				
+
 				Editor.addAction(new ChangeAction(object, "material", material));
 			}
 
 			//Dragged file
-			if(event.dataTransfer.files.length > 0)
-			{
+			if (event.dataTransfer.files.length > 0) {
 				var files = event.dataTransfer.files;
 
-				for(var i = 0; i < files.length; i++)
-				{
+				for (var i = 0; i < files.length; i++) {
 					var file = files[i];
 
 					//Check if mouse intersects and object
-					if(intersections.length > 0)
-					{
+					if (intersections.length > 0) {
 						var name = FileSystem.getFileName(file.name);
 						var object = intersections[0].object;
 
 						//Image
-						if(Image.fileIsImage(file))
-						{
-							Editor.loadTexture(file, function(texture)
-							{
-								attachTexture(texture ,object);
+						if (Image.fileIsImage(file)) {
+							Editor.loadTexture(file, function (texture) {
+								attachTexture(texture, object);
 							});
 						}
 						//Video
-						else if(Video.fileIsVideo(file))
-						{
-							Editor.loadVideoTexture(file, function(texture)
-							{
-								attachTexture(texture ,object);
+						else if (Video.fileIsVideo(file)) {
+							Editor.loadVideoTexture(file, function (texture) {
+								attachTexture(texture, object);
 							});
 						}
 						//Font
-						else if(Font.fileIsFont(file))
-						{
-							if(object.font !== undefined)
-							{
-								Editor.loadFont(file, function(font)
-								{
+						else if (Font.fileIsFont(file)) {
+							if (object.font !== undefined) {
+								Editor.loadFont(file, function (font) {
 									object.setFont(font);
 								});
 							}
 						}
 					}
-					
+
 					//Model
-					if(Model.fileIsModel(file))
-					{
+					if (Model.fileIsModel(file)) {
 						Editor.loadModel(file);
 					}
 				}
 			}
 			//Dragged resource
-			else if(draggedObject !== null)
-			{
+			else if (draggedObject !== null) {
 				//Object intersected
-				if(intersections.length > 0)
-				{
+				if (intersections.length > 0) {
 					var object = intersections[0].object;
 
 					//Material
-					if(draggedObject instanceof THREE.Material)
-					{
+					if (draggedObject instanceof THREE.Material) {
 						//Sprite material
-						if(draggedObject instanceof THREE.SpriteMaterial)
-						{
-							if(object instanceof THREE.Sprite)
-							{
+						if (draggedObject instanceof THREE.SpriteMaterial) {
+							if (object instanceof THREE.Sprite) {
 								Editor.addAction(new ChangeAction(object, "material", draggedObject));
 							}
 						}
 						//Points material
-						else if(draggedObject instanceof THREE.PointsMaterial)
-						{
-							if(object instanceof THREE.Points)
-							{
+						else if (draggedObject instanceof THREE.PointsMaterial) {
+							if (object instanceof THREE.Points) {
 								Editor.addAction(new ChangeAction(object, "material", draggedObject));
 							}
-							else if(object.geometry !== undefined)
-							{
+							else if (object.geometry !== undefined) {
 								var newObject = new THREE.Points(object.geometry, draggedObject);
 								copyDetails(newObject, object);
 								Editor.addAction(new SwapAction(object, newObject, true));
 							}
 						}
 						//Line material
-						else if(draggedObject instanceof THREE.LineBasicMaterial)
-						{
-							if(object instanceof THREE.Line)
-							{
+						else if (draggedObject instanceof THREE.LineBasicMaterial) {
+							if (object instanceof THREE.Line) {
 								Editor.addAction(new ChangeAction(object, "material", draggedObject));
 							}
-							else if(object.geometry !== undefined)
-							{
+							else if (object.geometry !== undefined) {
 								var newObject = new THREE.Line(object.geometry, draggedObject);
 								copyDetails(newObject, object);
 								Editor.addAction(new SwapAction(object, newObject, true));
 							}
 						}
 						//Shader material
-						else if(draggedObject instanceof THREE.ShaderMaterial)
-						{
-							if(object.material !== undefined)
-							{
+						else if (draggedObject instanceof THREE.ShaderMaterial) {
+							if (object.material !== undefined) {
 								Editor.addAction(new ChangeAction(object, "material", draggedObject));
 							}
 						}
 						//Mesh material
-						else
-						{
-							if(object instanceof THREE.Mesh)
-							{
+						else {
+							if (object instanceof THREE.Mesh) {
 								Editor.addAction(new ChangeAction(object, "material", draggedObject));
 							}
-							else if(object.geometry !== undefined)
-							{
+							else if (object.geometry !== undefined) {
 								var newObject = new THREE.Mesh(object.geometry, draggedObject);
 								copyDetails(newObject, object);
 								Editor.addAction(new SwapAction(object, newObject, true));
@@ -211,51 +175,41 @@ function SceneEditor(parent, closeable, container, index)
 						}
 					}
 					//Cubemap
-					else if(draggedObject.isCubeTexture === true)
-					{
-						if(object.material instanceof THREE.Material)
-						{
+					else if (draggedObject.isCubeTexture === true) {
+						if (object.material instanceof THREE.Material) {
 							Editor.addAction(new ChangeAction(object.material, "envMap", draggedObject));
 							self.canvas.reloadContext();
 						}
 					}
 					//Texture
-					else if(draggedObject instanceof THREE.Texture)
-					{
+					else if (draggedObject instanceof THREE.Texture) {
 						attachTexture(draggedObject, object);
 					}
 					//Image
-					else if(draggedObject instanceof Image)
-					{
+					else if (draggedObject instanceof Image) {
 						attachTexture(new Texture(draggedObject), object);
 					}
 					//Video
-					else if(draggedObject instanceof Video)
-					{
+					else if (draggedObject instanceof Video) {
 						attachTexture(new VideoTexture(draggedObject), object);
 					}
 					//Font
-					else if(draggedObject instanceof Font)
-					{
-						if(object.font !== undefined)
-						{
+					else if (draggedObject instanceof Font) {
+						if (object.font !== undefined) {
 							object.setFont(draggedObject);
 							Editor.updateObjectsViewsGUI();
 						}
 					}
 					//Geometry
-					else if(draggedObject instanceof THREE.Geometry || draggedObject instanceof THREE.BufferGeometry)
-					{
-						if(object instanceof THREE.Mesh || object instanceof THREE.Points || object instanceof THREE.Line)
-						{
+					else if (draggedObject instanceof THREE.Geometry || draggedObject instanceof THREE.BufferGeometry) {
+						if (object instanceof THREE.Mesh || object instanceof THREE.Points || object instanceof THREE.Line) {
 							Editor.addAction(new ChangeAction(object, "geometry", draggedObject));
 						}
 					}
 				}
 
 				//Create audio emitter
-				if(draggedObject instanceof Audio)
-				{
+				if (draggedObject instanceof Audio) {
 					var audio = new AudioEmitter(draggedObject);
 					audio.name = draggedObject.name;
 					Editor.addObject(audio);
@@ -329,7 +283,7 @@ function SceneEditor(parent, closeable, container, index)
 	 * @type {SideBar}
 	 */
 	this.sideBar = new SideBar(this);
-	
+
 	/**
 	 * Camera orientation cube.
 	 *
@@ -420,7 +374,7 @@ function SceneEditor(parent, closeable, container, index)
 	 * @type {THREE.Camera}
 	 */
 	this.camera = null;
-	
+
 	/** 
 	 * Camera controls object used to manipulate the camera position.
 	 *
@@ -447,17 +401,14 @@ function SceneEditor(parent, closeable, container, index)
 	this.transformationSpace.addValue(Locale.local, TransformControls.LOCAL);
 	this.transformationSpace.addValue(Locale.world, TransformControls.WORLD);
 	this.transformationSpace.element.style.opacity = 0.5;
-	this.transformationSpace.setOnChange(function()
-	{
+	this.transformationSpace.setOnChange(function () {
 		Editor.settings.editor.transformationSpace = self.transformationSpace.getValue();
 		self.transform.setSpace(Editor.settings.editor.transformationSpace);
 	});
-	this.transformationSpace.element.onmouseenter = function()
-	{
+	this.transformationSpace.element.onmouseenter = function () {
 		this.style.opacity = 1.0;
 	};
-	this.transformationSpace.element.onmouseleave = function()
-	{
+	this.transformationSpace.element.onmouseleave = function () {
 		this.style.opacity = 0.5;
 	};
 
@@ -482,17 +433,14 @@ function SceneEditor(parent, closeable, container, index)
 	this.navigation.addValue(Locale.top, Settings.PLANAR_TOP);
 	this.navigation.addValue(Locale.bottom, Settings.PLANAR_BOTTOM);
 	this.navigation.element.style.opacity = 0.5;
-	this.navigation.setOnChange(function()
-	{
+	this.navigation.setOnChange(function () {
 		Editor.settings.editor.navigation = self.navigation.getValue();
 		self.updateCameraControls(Editor.settings.editor.navigation);
 	});
-	this.navigation.element.onmouseenter = function()
-	{
+	this.navigation.element.onmouseenter = function () {
 		this.style.opacity = 1.0;
 	};
-	this.navigation.element.onmouseleave = function()
-	{
+	this.navigation.element.onmouseleave = function () {
 		this.style.opacity = 0.5;
 	};
 
@@ -513,24 +461,19 @@ function SceneEditor(parent, closeable, container, index)
 	this.cameraButton.element.style.backgroundColor = "#333333";
 	this.cameraButton.element.style.borderRadius = "5px";
 	this.cameraButton.element.style.opacity = 0.5;
-	this.cameraButton.element.onmouseenter = function()
-	{
+	this.cameraButton.element.onmouseenter = function () {
 		this.style.opacity = 1.0;
 	};
-	this.cameraButton.element.onmouseleave = function()
-	{
+	this.cameraButton.element.onmouseleave = function () {
 		this.style.opacity = 0.5;
 	};
-	this.cameraButton.setOnClick(function()
-	{
+	this.cameraButton.setOnClick(function () {
 		self.setCameraMode();
 
-		if(self.cameraMode === SceneEditor.ORTHOGRAPHIC)
-		{
+		if (self.cameraMode === SceneEditor.ORTHOGRAPHIC) {
 			self.cameraButton.setImage(Global.FILE_PATH + "icons/misc/2d.png");
 		}
-		else if(self.cameraMode === SceneEditor.PERSPECTIVE)
-		{
+		else if (self.cameraMode === SceneEditor.PERSPECTIVE) {
 			self.cameraButton.setImage(Global.FILE_PATH + "icons/misc/3d.png");
 		}
 	});
@@ -542,42 +485,47 @@ function SceneEditor(parent, closeable, container, index)
 	 * @type {EventManager}
 	 */
 	this.manager = new EventManager();
-	this.manager.add(document.body, "keydown", function(event)
-	{
+	this.manager.add(document.body, "keydown", function (event) {
 		var key = event.keyCode;
 
-		if(event.ctrlKey)
-		{
-			if(self.container.focused)
-			{
-				if(key === Keyboard.NUM1)
-				{
-					self.sideBar.selectTool(SceneEditor.SELECT);
-				}
-				else if(key === Keyboard.NUM2)
-				{
-					self.sideBar.selectTool(SceneEditor.MOVE);
-				}
-				else if(key === Keyboard.NUM3)
-				{
-					self.sideBar.selectTool(SceneEditor.SCALE);
-				}
-				else if(key === Keyboard.NUM4)
-				{
-					self.sideBar.selectTool(SceneEditor.ROTATE);
-				}
-				else if(key === Keyboard.C)
-				{
+		if (event.ctrlKey) {
+			if (self.container.focused) {
+				// if (key === Keyboard.NUM1) {
+				// 	self.sideBar.selectTool(SceneEditor.SELECT);
+				// }
+				// else if (key === Keyboard.NUM2) {
+				// 	self.sideBar.selectTool(SceneEditor.MOVE);
+				// }
+				// else if (key === Keyboard.NUM3) {
+				// 	self.sideBar.selectTool(SceneEditor.SCALE);
+				// }
+				// else if (key === Keyboard.NUM4) {
+				// 	self.sideBar.selectTool(SceneEditor.ROTATE);
+				// }
+				if (key === Keyboard.C) {
 					Editor.copyObject();
 				}
-				else if(key === Keyboard.V)
-				{
+				else if (key === Keyboard.V) {
 					Editor.pasteObject();
 				}
-				else if(key === Keyboard.X)
-				{
+				else if (key === Keyboard.X) {
 					Editor.cutObject();
 				}
+			}
+		}
+
+		if (self.container.focused) {
+			if (key === Keyboard.Q) {
+				self.sideBar.selectTool(SceneEditor.SELECT);
+			}
+			else if (key === Keyboard.W) {
+				self.sideBar.selectTool(SceneEditor.MOVE);
+			}
+			else if (key === Keyboard.E) {
+				self.sideBar.selectTool(SceneEditor.SCALE);
+			}
+			else if (key === Keyboard.R) {
+				self.sideBar.selectTool(SceneEditor.ROTATE);
 			}
 		}
 	});
@@ -599,39 +547,32 @@ SceneEditor.prototype.createRenderer = RendererCanvas.prototype.createRenderer;
 SceneEditor.prototype.reloadContext = RendererCanvas.prototype.reloadContext;
 SceneEditor.prototype.forceContextLoss = RendererCanvas.prototype.forceContextLoss;
 
-SceneEditor.prototype.updateMetadata = function()
-{
-	if(this.scene !== null)
-	{
+SceneEditor.prototype.updateMetadata = function () {
+	if (this.scene !== null) {
 		this.setName(this.scene.name);
 
 		//Check if object has a parent
-		if(this.scene.parent === null)
-		{
+		if (this.scene.parent === null) {
 			this.close();
 			return;
 		}
 
 		//Check if object exists in parent
 		var children = this.scene.parent.children;
-		for(var i = 0; i < children.length; i++)
-		{
-			if(this.scene.uuid === children[i].uuid)
-			{
+		for (var i = 0; i < children.length; i++) {
+			if (this.scene.uuid === children[i].uuid) {
 				return;
 			}
 		}
 
 		//If not found close tab
-		if(i >= children.length)
-		{
+		if (i >= children.length) {
 			this.close();
 		}
 	}
 };
 
-SceneEditor.prototype.activate = function()
-{
+SceneEditor.prototype.activate = function () {
 	TabElement.prototype.activate.call(this);
 
 	this.canvas.createRenderer();
@@ -645,8 +586,7 @@ SceneEditor.prototype.activate = function()
 	this.sideBar.selectTool(SceneEditor.SELECT);
 };
 
-SceneEditor.prototype.deactivate = function()
-{
+SceneEditor.prototype.deactivate = function () {
 	TabElement.prototype.deactivate.call(this);
 
 	this.mouse.dispose();
@@ -661,33 +601,27 @@ SceneEditor.prototype.deactivate = function()
  * @method updateCameraControls
  * @param {number} mode Camera mode.
  */
-SceneEditor.prototype.updateCameraControls = function(mode)
-{
-	if(this.controlsMode === mode)
-	{
+SceneEditor.prototype.updateCameraControls = function (mode) {
+	if (this.controlsMode === mode) {
 		return;
 	}
-	
+
 	this.controlsMode = mode;
 
-	if(mode === Settings.FIRST_PERSON)
-	{
+	if (mode === Settings.FIRST_PERSON) {
 		this.controls = new EditorFreeControls();
 	}
-	else if(mode === Settings.ORBIT)
-	{
+	else if (mode === Settings.ORBIT) {
 		this.controls = new EditorOrbitControls();
 	}
-	else
-	{
+	else {
 		this.controls = new EditorPlanarControls(mode);
 	}
 
 	this.controls.attach(this.camera);
 }
 
-SceneEditor.prototype.updateSettings = function()
-{
+SceneEditor.prototype.updateSettings = function () {
 	//Grid
 	this.gridHelper.visible = Editor.settings.editor.gridEnabled;
 	this.gridHelper.setSize(Editor.settings.editor.gridSize);
@@ -716,8 +650,7 @@ SceneEditor.prototype.updateSettings = function()
 	this.stats.dom.style.display = (Editor.settings.general.showStats && this.visible) ? "block" : "none";
 };
 
-SceneEditor.prototype.destroy = function()
-{
+SceneEditor.prototype.destroy = function () {
 	TabElement.prototype.destroy.call(this);
 
 	this.mouse.dispose();
@@ -729,13 +662,11 @@ SceneEditor.prototype.destroy = function()
 	this.canvas.forceContextLoss();
 };
 
-SceneEditor.prototype.attach = function(scene)
-{
+SceneEditor.prototype.attach = function (scene) {
 	this.scene = scene;
 	this.updateMetadata();
 
-	if(this.camera !== null)
-	{
+	if (this.camera !== null) {
 		this.scene.defaultCamera = this.camera;
 	}
 };
@@ -746,8 +677,7 @@ SceneEditor.prototype.attach = function(scene)
  * @method isAttached
  * @param {THREE.Object3D} scene
  */
-SceneEditor.prototype.isAttached = function(scene)
-{
+SceneEditor.prototype.isAttached = function (scene) {
 	return this.scene === scene;
 };
 
@@ -756,45 +686,35 @@ SceneEditor.prototype.isAttached = function(scene)
  *
  * @method update
  */
-SceneEditor.prototype.update = function()
-{
+SceneEditor.prototype.update = function () {
 	this.mouse.update();
 	this.keyboard.update();
 
-	if(this.stats !== null)
-	{
+	if (this.stats !== null) {
 		this.stats.begin();
 	}
 
 	var isEditingObject = false;
 
 	//Check if mouse is inside canvas
-	if(this.mouse.insideCanvas())
-	{
+	if (this.mouse.insideCanvas()) {
 		//Update selection
-		if(this.mode === SceneEditor.SELECT)
-		{
-			if(this.mouse.buttonJustPressed(Mouse.LEFT))
-			{
+		if (this.mode === SceneEditor.SELECT) {
+			if (this.mouse.buttonJustPressed(Mouse.LEFT)) {
 				this.selectObjectWithMouse();
 			}
-			
-			if(Editor.selection.length > 0)
-			{
-				if(this.mouse.buttonDoubleClicked(Mouse.LEFT) || this.keyboard.keyJustPressed(Keyboard.F))
-				{
-					if(Editor.selection[0].isObject3D === true)
-					{
+
+			if (Editor.selection.length > 0) {
+				if (this.mouse.buttonDoubleClicked(Mouse.LEFT) || this.keyboard.keyJustPressed(Keyboard.F)) {
+					if (Editor.selection[0].isObject3D === true) {
 						this.controls.focusObject(Editor.selection[0]);
 					}
 				}
 			}
 		}
-		else
-		{
+		else {
 			//If mouse double clicked select object
-			if(this.mouse.buttonDoubleClicked(Mouse.LEFT))
-			{
+			if (this.mouse.buttonDoubleClicked(Mouse.LEFT)) {
 				this.selectObjectWithMouse();
 			}
 
@@ -802,24 +722,19 @@ SceneEditor.prototype.update = function()
 		}
 
 		//Lock mouse when camera is moving
-		if(Editor.settings.editor.lockMouse && Nunu.runningOnDesktop())
-		{
-			if(!isEditingObject && (this.mouse.buttonJustPressed(Mouse.LEFT) || this.mouse.buttonJustPressed(Mouse.RIGHT) || this.mouse.buttonJustPressed(Mouse.MIDDLE)))
-			{
+		if (Editor.settings.editor.lockMouse && Nunu.runningOnDesktop()) {
+			if (!isEditingObject && (this.mouse.buttonJustPressed(Mouse.LEFT) || this.mouse.buttonJustPressed(Mouse.RIGHT) || this.mouse.buttonJustPressed(Mouse.MIDDLE))) {
 				this.mouse.setLock(true);
 			}
-			else if(this.mouse.buttonJustReleased(Mouse.LEFT) || this.mouse.buttonJustReleased(Mouse.RIGHT) || this.mouse.buttonJustReleased(Mouse.MIDDLE))
-			{
+			else if (this.mouse.buttonJustReleased(Mouse.LEFT) || this.mouse.buttonJustReleased(Mouse.RIGHT) || this.mouse.buttonJustReleased(Mouse.MIDDLE)) {
 				this.mouse.setLock(false);
 			}
 		}
 
-		if(isEditingObject)
-		{
+		if (isEditingObject) {
 			Editor.gui.inspector.updateValues();
 		}
-		else
-		{
+		else {
 			//Update controls
 			this.controls.update(this.mouse, this.keyboard);
 
@@ -830,28 +745,23 @@ SceneEditor.prototype.update = function()
 	}
 
 	//If has objects selected
-	if(Editor.hasObjectSelected())
-	{
+	if (Editor.hasObjectSelected()) {
 		//Update object transformation matrix
-		for(var i = 0; i < Editor.selection.length; i++)
-		{
-			if(Editor.selection[i].matrixAutoUpdate === false)
-			{
+		for (var i = 0; i < Editor.selection.length; i++) {
+			if (Editor.selection[i].matrixAutoUpdate === false) {
 				Editor.selection[i].updateMatrix();
 			}
 		}
-		
+
 		//Update object helper
-		this.objectHelper.traverse(function(children)
-		{
-			children.update();	
+		this.objectHelper.traverse(function (children) {
+			children.update();
 		});
 	}
 
 	this.render();
 
-	if(this.stats !== null)
-	{
+	if (this.stats !== null) {
 		this.stats.end();
 	}
 };
@@ -863,10 +773,8 @@ SceneEditor.prototype.update = function()
  * 
  * @method render
  */
-SceneEditor.prototype.render = function()
-{
-	if(this.canvas.renderer === null)
-	{
+SceneEditor.prototype.render = function () {
+	if (this.canvas.renderer === null) {
 		console.warn("nunuStudio: SceneEditor renderer is null.", this);
 		return;
 	}
@@ -887,8 +795,7 @@ SceneEditor.prototype.render = function()
 	//Render scene
 	renderer.render(this.scene, this.camera);
 
-	if(this.canvas.cssRenderer !== null)
-	{
+	if (this.canvas.cssRenderer !== null) {
 		this.canvas.cssRenderer.render(this.scene, this.camera);
 	}
 
@@ -896,12 +803,10 @@ SceneEditor.prototype.render = function()
 	renderer.render(this.toolScene, this.camera);
 
 	//Draw camera cube
-	if(Editor.settings.editor.cameraRotationCube)
-	{
+	if (Editor.settings.editor.cameraRotationCube) {
 		var code = this.orientation.raycast(this.mouse, canvas);
-		
-		if(code !== null && (this.mouse.buttonDoubleClicked(Mouse.LEFT) || this.mouse.buttonJustPressed(Mouse.MIDDLE)))
-		{
+
+		if (code !== null && (this.mouse.buttonDoubleClicked(Mouse.LEFT) || this.mouse.buttonJustPressed(Mouse.MIDDLE))) {
 			this.controls.setOrientation(code);
 		}
 
@@ -911,8 +816,7 @@ SceneEditor.prototype.render = function()
 	}
 
 	//Camera preview
-	if(Editor.settings.editor.cameraPreviewEnabled)
-	{
+	if (Editor.settings.editor.cameraPreviewEnabled) {
 		renderer.setScissorTest(true);
 
 		var viewport = new Viewport();
@@ -926,8 +830,7 @@ SceneEditor.prototype.render = function()
 		viewport.enable(renderer);
 
 		//Preview selected camera
-		if(Editor.selection[0] instanceof PerspectiveCamera || Editor.selection[0] instanceof OrthographicCamera)
-		{
+		if (Editor.selection[0] instanceof PerspectiveCamera || Editor.selection[0] instanceof OrthographicCamera) {
 			renderer.clear(true, true, true);
 
 			var camera = Editor.selection[0];
@@ -936,12 +839,10 @@ SceneEditor.prototype.render = function()
 			camera.render(renderer, this.scene);
 		}
 		//Cube camera
-		else if(Editor.selection[0] instanceof CubeCamera)
-		{
+		else if (Editor.selection[0] instanceof CubeCamera) {
 			var cameras = Editor.selection[0].cameras;
 
-			function renderCamera(index, x, y, w, h)
-			{
+			function renderCamera(index, x, y, w, h) {
 				renderer.setViewport(x, y, w, h);
 				renderer.setScissor(x, y, w, h);
 				renderer.clear(true, true, true);
@@ -952,7 +853,7 @@ SceneEditor.prototype.render = function()
 
 			var size = height / 3;
 			x += width - size * 4;
-			
+
 			renderCamera(CubeTexture.LEFT, x, y + size, size, size);
 			renderCamera(CubeTexture.FRONT, x + size, y + size, size, size);
 			renderCamera(CubeTexture.RIGHT, x + size * 2, y + size, size, size);
@@ -961,12 +862,10 @@ SceneEditor.prototype.render = function()
 			renderCamera(CubeTexture.BOTTOM, x + size, y, size, size);
 		}
 		//Preview all cameras in use
-		else if(this.scene.cameras !== undefined && this.scene.cameras.length > 0)
-		{
+		else if (this.scene.cameras !== undefined && this.scene.cameras.length > 0) {
 			renderer.clear(true, true, true);
 
-			for(var i = 0; i < this.scene.cameras.length; i++)
-			{
+			for (var i = 0; i < this.scene.cameras.length; i++) {
 				var camera = this.scene.cameras[i];
 				camera.resize(width, height, viewport);
 				camera.setupRenderer(renderer);
@@ -983,8 +882,7 @@ SceneEditor.prototype.render = function()
  *
  * @method updateRaycasterFromMouse
  */
-SceneEditor.prototype.updateRaycasterFromMouse = function()
-{
+SceneEditor.prototype.updateRaycasterFromMouse = function () {
 	this.normalized.set((this.mouse.position.x / this.canvas.resolution.x) * 2 - 1, -(this.mouse.position.y / this.canvas.resolution.y) * 2 + 1);
 	this.raycaster.setFromCamera(this.normalized, this.camera);
 };
@@ -994,27 +892,21 @@ SceneEditor.prototype.updateRaycasterFromMouse = function()
  *
  * @method selectObjectWithMouse
  */
-SceneEditor.prototype.selectObjectWithMouse = function()
-{
+SceneEditor.prototype.selectObjectWithMouse = function () {
 	this.updateRaycasterFromMouse();
 
 	var intersects = this.raycaster.intersectObjects(this.scene.children, true);
 
-	if(intersects.length > 0)
-	{	
-		if(this.keyboard.keyPressed(Keyboard.CTRL))
-		{	
-			if(Editor.isSelected(intersects[0].object))
-			{
+	if (intersects.length > 0) {
+		if (this.keyboard.keyPressed(Keyboard.CTRL)) {
+			if (Editor.isSelected(intersects[0].object)) {
 				Editor.unselectObject(intersects[0].object);
 			}
-			else
-			{
+			else {
 				Editor.addToSelection(intersects[0].object);
 			}
 		}
-		else
-		{
+		else {
 			Editor.selectObject(intersects[0].object);
 		}
 	}
@@ -1027,8 +919,7 @@ SceneEditor.prototype.selectObjectWithMouse = function()
  * @param {number} x
  * @param {number} y
  */
-SceneEditor.prototype.updateRaycaster = function(x, y)
-{
+SceneEditor.prototype.updateRaycaster = function (x, y) {
 	this.normalized.set(x, y);
 	this.raycaster.setFromCamera(this.normalized, this.camera);
 };
@@ -1039,40 +930,33 @@ SceneEditor.prototype.updateRaycaster = function(x, y)
  * @method setCameraMode
  * @param {number} mode
  */
-SceneEditor.prototype.setCameraMode = function(mode)
-{
-	if(mode === this.cameraMode)
-	{
+SceneEditor.prototype.setCameraMode = function (mode) {
+	if (mode === this.cameraMode) {
 		return;
 	}
 
-	if(mode === undefined)
-	{
+	if (mode === undefined) {
 		mode = (this.cameraMode === SceneEditor.PERSPECTIVE) ? SceneEditor.ORTHOGRAPHIC : SceneEditor.PERSPECTIVE;
 	}
-	
+
 	this.cameraMode = mode;
 
 	var aspect = (this.canvas !== null) ? (this.canvas.resolution.x / this.canvas.resolution.y) : 1.0;
 
-	if(this.cameraMode === SceneEditor.ORTHOGRAPHIC)
-	{
+	if (this.cameraMode === SceneEditor.ORTHOGRAPHIC) {
 		this.camera = new OrthographicCamera(10, aspect, OrthographicCamera.RESIZE_HORIZONTAL);
 	}
-	else if(this.cameraMode === SceneEditor.PERSPECTIVE)
-	{
+	else if (this.cameraMode === SceneEditor.PERSPECTIVE) {
 		this.camera = new PerspectiveCamera(60, aspect);
 	}
 
-	if(this.scene !== null)
-	{
+	if (this.scene !== null) {
 		this.scene.defaultCamera = this.camera;
 	}
 
 	this.transform.setCamera(this.camera);
 
-	if(this.controls !== null)
-	{
+	if (this.controls !== null) {
 		this.controls.attach(this.camera);
 		this.controls.reset();
 	}
@@ -1087,29 +971,23 @@ SceneEditor.prototype.setCameraMode = function(mode)
  * @param selectTool
  * @param {number} tool Tool to select.
  */
-SceneEditor.prototype.selectTool = function(tool)
-{	
-	if(tool !== undefined)
-	{
+SceneEditor.prototype.selectTool = function (tool) {
+	if (tool !== undefined) {
 		this.mode = tool;
 	}
 
-	if(this.mode === SceneEditor.MOVE)
-	{
+	if (this.mode === SceneEditor.MOVE) {
 		this.transform.setMode(TransformControls.TRANSLATE);
 		this.transform.setSpace(Editor.settings.editor.transformationSpace);
 	}
-	else if(this.mode === SceneEditor.SCALE)
-	{
+	else if (this.mode === SceneEditor.SCALE) {
 		this.transform.setMode(TransformControls.SCALE);
 	}
-	else if(this.mode === SceneEditor.ROTATE)
-	{
+	else if (this.mode === SceneEditor.ROTATE) {
 		this.transform.setMode(TransformControls.ROTATE);
 		this.transform.setSpace(Editor.settings.editor.transformationSpace);
 	}
-	else if(this.mode === SceneEditor.SELECT)
-	{
+	else if (this.mode === SceneEditor.SELECT) {
 		this.transform.setMode(TransformControls.NONE);
 	}
 };
@@ -1121,14 +999,11 @@ SceneEditor.prototype.selectTool = function(tool)
  *
  * @method updateSelection
  */
-SceneEditor.prototype.updateSelection = function()
-{
+SceneEditor.prototype.updateSelection = function () {
 	//Filter Object3D objects only (to exclude resources)
 	var selectedObjects = [];
-	for(var i = 0; i < Editor.selection.length; i++)
-	{
-		if(Editor.selection[i].isObject3D === true)
-		{
+	for (var i = 0; i < Editor.selection.length; i++) {
+		if (Editor.selection[i].isObject3D === true) {
 			selectedObjects.push(Editor.selection[i]);
 		}
 	}
@@ -1136,116 +1011,95 @@ SceneEditor.prototype.updateSelection = function()
 	this.transform.attach(selectedObjects);
 	this.objectHelper.removeAll();
 
-	for(var i = 0; i < selectedObjects.length; i++)
-	{
+	for (var i = 0; i < selectedObjects.length; i++) {
 		var object = selectedObjects[i];
 
 		//Camera
-		if(object instanceof THREE.Camera)
-		{
+		if (object instanceof THREE.Camera) {
 			this.objectHelper.add(new THREE.CameraHelper(object));
 			this.objectHelper.add(new ObjectIconHelper(object, Global.FILE_PATH + "icons/camera/camera.png"));
 		}
 		//Light
-		else if(object instanceof THREE.Light)
-		{
+		else if (object instanceof THREE.Light) {
 			//Directional light
-			if(object instanceof THREE.DirectionalLight)
-			{
+			if (object instanceof THREE.DirectionalLight) {
 				this.objectHelper.add(new THREE.DirectionalLightHelper(object, 1));
 			}
 			//Point light
-			else if(object instanceof THREE.PointLight)
-			{
+			else if (object instanceof THREE.PointLight) {
 				this.objectHelper.add(new THREE.PointLightHelper(object, 1));
 			}
 			//RectArea light
-			else if(object instanceof THREE.RectAreaLight)
-			{
+			else if (object instanceof THREE.RectAreaLight) {
 				this.objectHelper.add(new RectAreaLightHelper(object));
 			}
 			//Spot light
-			else if(object instanceof THREE.SpotLight)
-			{
+			else if (object instanceof THREE.SpotLight) {
 				this.objectHelper.add(new THREE.SpotLightHelper(object));
 			}
 			//Hemisphere light
-			else if(object instanceof THREE.HemisphereLight)
-			{
+			else if (object instanceof THREE.HemisphereLight) {
 				this.objectHelper.add(new THREE.HemisphereLightHelper(object, 1));
 			}
 			//Ambient light
-			else
-			{
+			else {
 				this.objectHelper.add(new ObjectIconHelper(object, ObjectIcons.get(object.type)));
 			}
 		}
 		//Physics
-		else if(object instanceof PhysicsObject)
-		{
+		else if (object instanceof PhysicsObject) {
 			this.objectHelper.add(new PhysicsObjectHelper(object));
 		}
 		//LensFlare
-		else if(object instanceof LensFlare)
-		{
+		else if (object instanceof LensFlare) {
 			this.objectHelper.add(new ObjectIconHelper(object, ObjectIcons.get(object.type)));
 		}
 		//Skinned Mesh
-		else if(object instanceof THREE.SkinnedMesh)
-		{
+		else if (object instanceof THREE.SkinnedMesh) {
 			this.objectHelper.add(new SkeletonHelper(object.parent));
 			this.objectHelper.add(new WireframeHelper(object, 0xFFFF00));
 		}
 		//Bone
-		else if(object instanceof THREE.Bone)
-		{
+		else if (object instanceof THREE.Bone) {
 			this.objectHelper.add(new SkeletonHelper(object.parent));
 			this.objectHelper.add(new ObjectIconHelper(object, ObjectIcons.get(object.type)));
 		}
 		//Mesh
-		else if(object instanceof THREE.Mesh)
-		{
+		else if (object instanceof THREE.Mesh) {
 			this.objectHelper.add(new WireframeHelper(object, 0xFFFF00));
 		}
 		//Line
-		else if(object instanceof THREE.Line)
-		{
+		else if (object instanceof THREE.Line) {
 			this.objectHelper.add(new LineHelper(object, 0xFFFF00));
 		}
 		//Points
-		else if(object instanceof THREE.Points)
-		{
+		else if (object instanceof THREE.Points) {
 			this.objectHelper.add(new PointsHelper(object, 0xFFFF00));
 		}
 		//Spine animation
-		else if(object instanceof SpineAnimation)
-		{
+		else if (object instanceof SpineAnimation) {
 			this.objectHelper.add(new WireframeHelper(object, 0xFFFFFF));
 			this.objectHelper.add(new ObjectIconHelper(object, ObjectIcons.get(object.type)));
 		}
 		//Container
-		else if(object instanceof Container)
-		{
+		else if (object instanceof Container) {
 			this.objectHelper.add(new THREE.BoxHelper(object, 0xFFFF00));
 			this.objectHelper.add(new ObjectIconHelper(object, ObjectIcons.get(object.type)));
 		}
 		//Object 3D
-		else
-		{
+		else {
 			this.objectHelper.add(new ObjectIconHelper(object, ObjectIcons.get(object.type)));
 		}
 	}
 };
 
-SceneEditor.prototype.updateVisibility = function()
-{
+SceneEditor.prototype.updateVisibility = function () {
 	TabElement.prototype.updateVisibility.call(this);
 
 	this.stats.dom.style.display = (Editor.settings.general.showStats && this.visible) ? "block" : "none";
 };
 
-SceneEditor.prototype.updateSize = function()
-{
+SceneEditor.prototype.updateSize = function () {
 	TabElement.prototype.updateSize.call(this);
 
 	this.sideBar.position.set(0, 0);
@@ -1259,8 +1113,7 @@ SceneEditor.prototype.updateSize = function()
 	this.canvas.size.set(width, height);
 	this.canvas.updateInterface();
 
-	if(this.camera !== null)
-	{
+	if (this.camera !== null) {
 		this.camera.aspect = width / height;
 		this.camera.updateProjectionMatrix();
 	}
