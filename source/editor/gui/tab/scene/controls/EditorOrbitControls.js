@@ -199,12 +199,12 @@ EditorOrbitControls.prototype.update = function(mouse, keyboard)
 		if(this.smooth === true)
 		{
 			this.speedOrientation.y += this.speed * Editor.settings.editor.mouseLookSensitivity * (Editor.settings.editor.invertNavigation ? mouse.delta.y : -mouse.delta.y);
-			this.speedOrientation.x -= this.speed * Editor.settings.editor.mouseLookSensitivity * mouse.delta.x;
+			this.speedOrientation.x -= this.speed * Editor.settings.editor.mouseLookSensitivity * -mouse.delta.x;
 		}
 		else
 		{
 			this.orientation.y += Editor.settings.editor.mouseLookSensitivity * (Editor.settings.editor.invertNavigation ? mouse.delta.y : -mouse.delta.y);
-			this.orientation.x -= Editor.settings.editor.mouseLookSensitivity * mouse.delta.x;
+			this.orientation.x -= Editor.settings.editor.mouseLookSensitivity * -mouse.delta.x;
 		}
 
 		this.needsUpdate = true;
