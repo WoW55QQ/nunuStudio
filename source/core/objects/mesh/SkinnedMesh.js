@@ -44,6 +44,7 @@ function SkinnedMesh(geometry, material, useVertexTexture)
 	THREE._SkinnedMesh.call(this, geometry, material, useVertexTexture);
 
 	this.name = "skinned";
+	
 	this.receiveShadow = true;
 	this.castShadow = true;
 }
@@ -83,7 +84,6 @@ SkinnedMesh.prototype.dispose = function()
  * @param {Skeleton} skeleton
  * @param {Matrix4} bindMatrix
  */
-
 SkinnedMesh.prototype.toJSON = function(meta)
 {
 	var self = this;

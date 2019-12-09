@@ -17,7 +17,6 @@ function ButtonDrawer(parent)
 	this.element.style.backgroundColor = Editor.theme.buttonColor;
 	this.element.style.overflow = "visible";
 
-	//Panel
 	this.panel = new Element(this, "div");
 	this.panel.element.style.overflow = "visible";
 	this.panel.element.style.backgroundColor = Editor.theme.barColor;
@@ -35,7 +34,7 @@ function ButtonDrawer(parent)
 	 * Number of maximum options per row
 	 *
 	 * @attribute optionsPerLine
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.optionsPerLine = 3;
 	
@@ -59,7 +58,7 @@ function ButtonDrawer(parent)
 	 * Indicates if the button drawer panel is visible.
 	 *
 	 * @attribute expanded
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	this.expanded = false;
 	this.setExpanded(false);
@@ -103,7 +102,7 @@ ButtonDrawer.prototype.clear = function()
  * Expand or close the button drawer panel.
  *
  * @method setExpanded
- * @param {Boolean} expanded
+ * @param {boolean} expanded
  */
 ButtonDrawer.prototype.setExpanded = function(expanded)
 {
@@ -128,9 +127,9 @@ ButtonDrawer.prototype.insertOption = function(element)
  * Add new option to the menu.
  * 
  * @method addOption
- * @param {String} image
+ * @param {string} image
  * @param {Function} callback
- * @param {String} altText
+ * @param {string} altText
  */
 ButtonDrawer.prototype.addOption = function(image, callback, altText)
 {
@@ -157,7 +156,7 @@ ButtonDrawer.prototype.addOption = function(image, callback, altText)
  * Remove an option from the menu.
  *
  * @method removeOption
- * @param {Number} index
+ * @param {number} index
  */
 ButtonDrawer.prototype.removeOption = function(index)
 {

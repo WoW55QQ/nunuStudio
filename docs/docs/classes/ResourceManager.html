@@ -32,6 +32,7 @@
 						</ul>
 						<div id="api-tabview-panel">
 							<ul id="api-classes" class="apis classes">
+								<li><a href="../classes/AfterimagePass.html">AfterimagePass</a></li>
 								<li><a href="../classes/AmbientLight.html">AmbientLight</a></li>
 								<li><a href="../classes/AnimationMixer.html">AnimationMixer</a></li>
 								<li><a href="../classes/AnimationTimer.html">AnimationTimer</a></li>
@@ -42,6 +43,7 @@
 								<li><a href="../classes/Base64Utils.html">Base64Utils</a></li>
 								<li><a href="../classes/BloomPass.html">BloomPass</a></li>
 								<li><a href="../classes/BokehPass.html">BokehPass</a></li>
+								<li><a href="../classes/BrowserView.html">BrowserView</a></li>
 								<li><a href="../classes/BufferUtils.html">BufferUtils</a></li>
 								<li><a href="../classes/ByteArrayUtils.html">ByteArrayUtils</a></li>
 								<li><a href="../classes/CanvasSprite.html">CanvasSprite</a></li>
@@ -92,7 +94,11 @@
 								<li><a href="../classes/ObjectUtils.html">ObjectUtils</a></li>
 								<li><a href="../classes/OrbitControls.html">OrbitControls</a></li>
 								<li><a href="../classes/OrthographicCamera.html">OrthographicCamera</a></li>
+								<li><a href="../classes/ParticleDistributions.html">ParticleDistributions</a></li>
 								<li><a href="../classes/ParticleEmitter.html">ParticleEmitter</a></li>
+								<li><a href="../classes/ParticleEmitterControl.html">ParticleEmitterControl</a></li>
+								<li><a href="../classes/ParticleEmitterControlOptions.html">ParticleEmitterControlOptions</a></li>
+								<li><a href="../classes/ParticleGroup.html">ParticleGroup</a></li>
 								<li><a href="../classes/Pass.html">Pass</a></li>
 								<li><a href="../classes/PerspectiveCamera.html">PerspectiveCamera</a></li>
 								<li><a href="../classes/PhysicsGenerator.html">PhysicsGenerator</a></li>
@@ -108,7 +114,9 @@
 								<li><a href="../classes/ResourceManager.html">ResourceManager</a></li>
 								<li><a href="../classes/Scene.html">Scene</a></li>
 								<li><a href="../classes/Script.html">Script</a></li>
+								<li><a href="../classes/ShaderAttribute.html">ShaderAttribute</a></li>
 								<li><a href="../classes/ShaderPass.html">ShaderPass</a></li>
+								<li><a href="../classes/ShaderUtils.html">ShaderUtils</a></li>
 								<li><a href="../classes/Skeleton.html">Skeleton</a></li>
 								<li><a href="../classes/SkinnedMesh.html">SkinnedMesh</a></li>
 								<li><a href="../classes/Sky.html">Sky</a></li>
@@ -121,6 +129,7 @@
 								<li><a href="../classes/SSAONOHPass.html">SSAONOHPass</a></li>
 								<li><a href="../classes/SSAOPass.html">SSAOPass</a></li>
 								<li><a href="../classes/SSAOShader.html">SSAOShader</a></li>
+								<li><a href="../classes/TargetConfig.html">TargetConfig</a></li>
 								<li><a href="../classes/TechnicolorPass.html">TechnicolorPass</a></li>
 								<li><a href="../classes/TextBitmap.html">TextBitmap</a></li>
 								<li><a href="../classes/TextFile.html">TextFile</a></li>
@@ -132,14 +141,15 @@
 								<li><a href="../classes/TizenKeyboard.html">TizenKeyboard</a></li>
 								<li><a href="../classes/Tree.html">Tree</a></li>
 								<li><a href="../classes/TreeUtils.html">TreeUtils</a></li>
+								<li><a href="../classes/TypedArrayHelper.html">TypedArrayHelper</a></li>
 								<li><a href="../classes/UnrealBloomPass.html">UnrealBloomPass</a></li>
 								<li><a href="../classes/Video.html">Video</a></li>
 								<li><a href="../classes/VideoLoader.html">VideoLoader</a></li>
 								<li><a href="../classes/VideoStream.html">VideoStream</a></li>
 								<li><a href="../classes/VideoTexture.html">VideoTexture</a></li>
 								<li><a href="../classes/Viewport.html">Viewport</a></li>
-								<li><a href="../classes/VRControls.html">VRControls</a></li>
 								<li><a href="../classes/WebcamTexture.html">WebcamTexture</a></li>
+								<li><a href="../classes/{Object} ParticleGroupOptions.html">{Object} ParticleGroupOptions</a></li>
 							</ul>
 				
 							<ul id="api-modules" class="apis modules">
@@ -167,7 +177,6 @@
 								<li><a href="../modules/Textures.html">Textures</a></li>
 								<li><a href="../modules/THREE.html">THREE</a></li>
 								<li><a href="../modules/Utils.html">Utils</a></li>
-								<li><a href="../modules/VirtualReality.html">VirtualReality</a></li>
 							</ul>
 						</div>
 					</div>
@@ -245,10 +254,6 @@
 						
 													</li>
 													<li class="index-item method">
-														<a href="#method_addRes">addRes</a>
-						
-													</li>
-													<li class="index-item method">
 														<a href="#method_addResource">addResource</a>
 						
 													</li>
@@ -297,15 +302,15 @@
 						
 													</li>
 													<li class="index-item method">
+														<a href="#method_removeGeometry">removeGeometry</a>
+						
+													</li>
+													<li class="index-item method">
 														<a href="#method_removeImage">removeImage</a>
 						
 													</li>
 													<li class="index-item method">
 														<a href="#method_removeMaterial">removeMaterial</a>
-						
-													</li>
-													<li class="index-item method">
-														<a href="#method_removeRes">removeRes</a>
 						
 													</li>
 													<li class="index-item method">
@@ -323,11 +328,6 @@
 													<li class="index-item method">
 														<a href="#method_ResourceContainer">ResourceContainer</a>
 						
-													</li>
-													<li class="index-item method">
-														<a href="#method_searchObject">searchObject</a>
-						
-															<span class="flag static">static</span>
 													</li>
 											</ul>
 										</div>
@@ -528,69 +528,6 @@
 																<div class="param-description">
 																	<p>Material to be added</p>
 											
-																</div>
-											
-															</li>
-														</ul>
-													</div>
-											
-											
-											</div>
-											<div id="method_addRes" class="method item">
-												<h3 class="name"><code>addRes</code></h3>
-											
-													<div class="args">
-														<span class="paren">(</span><ul class="args-list inline commas">
-															<li class="arg">
-																	<code>resource</code>
-															</li>
-															<li class="arg">
-																	<code>category</code>
-															</li>
-														</ul><span class="paren">)</span>
-													</div>
-											
-											
-											
-											
-											
-											
-											
-											
-												<div class="meta">
-															<p>
-													</p>
-											
-											
-											
-												</div>
-											
-												<div class="description">
-													<p>Add resource (of any type) to category.</p>
-											
-												</div>
-											
-													<div class="params">
-														<h4>Parameters:</h4>
-											
-														<ul class="params-list">
-															<li class="param">
-																	<code class="param-name">resource</code>
-																	<span class="type"><a href="../classes/Resource.html" class="crosslink">Resource</a></span>
-											
-											
-																<div class="param-description">
-																	 
-																</div>
-											
-															</li>
-															<li class="param">
-																	<code class="param-name">category</code>
-																	<span class="type">String</span>
-											
-											
-																<div class="param-description">
-																	 
 																</div>
 											
 															</li>
@@ -1197,7 +1134,7 @@
 												</div>
 											
 												<div class="description">
-													<p>Remove audio.</p>
+													<p>Remove audio resource from the manager, replace on objects that are using it with another resource.</p>
 											
 												</div>
 											
@@ -1281,6 +1218,56 @@
 															<li class="param">
 																	<code class="param-name">defaultFont</code>
 																	<span class="type"><a href="../classes/Font.html" class="crosslink">Font</a></span>
+											
+											
+																<div class="param-description">
+																	 
+																</div>
+											
+															</li>
+														</ul>
+													</div>
+											
+											
+											</div>
+											<div id="method_removeGeometry" class="method item">
+												<h3 class="name"><code>removeGeometry</code></h3>
+											
+													<div class="args">
+														<span class="paren">(</span><ul class="args-list inline commas">
+															<li class="arg">
+																	<code>geometry</code>
+															</li>
+														</ul><span class="paren">)</span>
+													</div>
+											
+											
+											
+											
+											
+											
+											
+											
+												<div class="meta">
+															<p>
+													</p>
+											
+											
+											
+												</div>
+											
+												<div class="description">
+													<p>Remove geometry from the list and replace by other.</p>
+											
+												</div>
+											
+													<div class="params">
+														<h4>Parameters:</h4>
+											
+														<ul class="params-list">
+															<li class="param">
+																	<code class="param-name">geometry</code>
+																	<span class="type"><a href="../classes/Resource.html" class="crosslink">Resource</a></span>
 											
 											
 																<div class="param-description">
@@ -1414,95 +1401,6 @@
 																<div class="param-description">
 																	<p>Defaul sprite material.</p>
 											
-																</div>
-											
-															</li>
-														</ul>
-													</div>
-											
-											
-											</div>
-											<div id="method_removeRes" class="method item">
-												<h3 class="name"><code>removeRes</code></h3>
-											
-													<div class="args">
-														<span class="paren">(</span><ul class="args-list inline commas">
-															<li class="arg">
-																	<code>resource</code>
-															</li>
-															<li class="arg">
-																	<code>category</code>
-															</li>
-															<li class="arg">
-																	<code>defaultResource</code>
-															</li>
-															<li class="arg">
-																	<code>defaultSubResource</code>
-															</li>
-														</ul><span class="paren">)</span>
-													</div>
-											
-											
-											
-											
-											
-											
-											
-											
-												<div class="meta">
-															<p>
-													</p>
-											
-											
-											
-												</div>
-											
-												<div class="description">
-													<p>Remove resource of any type from category.</p>
-											
-												</div>
-											
-													<div class="params">
-														<h4>Parameters:</h4>
-											
-														<ul class="params-list">
-															<li class="param">
-																	<code class="param-name">resource</code>
-																	<span class="type"><a href="../classes/Resource.html" class="crosslink">Resource</a></span>
-											
-											
-																<div class="param-description">
-																	 
-																</div>
-											
-															</li>
-															<li class="param">
-																	<code class="param-name">category</code>
-																	<span class="type">String</span>
-											
-											
-																<div class="param-description">
-																	 
-																</div>
-											
-															</li>
-															<li class="param">
-																	<code class="param-name">defaultResource</code>
-																	<span class="type">Object</span>
-											
-											
-																<div class="param-description">
-																	 
-																</div>
-											
-															</li>
-															<li class="param">
-																	<code class="param-name">defaultSubResource</code>
-																	<span class="type">Object</span>
-											
-											
-																<div class="param-description">
-																	 
 																</div>
 											
 															</li>
@@ -1725,99 +1623,6 @@
 											
 											
 											</div>
-											<div id="method_searchObject" class="method item">
-												<h3 class="name"><code>searchObject</code></h3>
-											
-													<div class="args">
-														<span class="paren">(</span><ul class="args-list inline commas">
-															<li class="arg">
-																	<code>object</code>
-															</li>
-															<li class="arg">
-																	<code>manager</code>
-															</li>
-															<li class="arg">
-																	<code>target</code>
-															</li>
-														</ul><span class="paren">)</span>
-													</div>
-											
-													<span class="returns-inline">
-														<span class="type">ResourceContainer</span>
-													</span>
-											
-											
-											
-											
-													<span class="flag static">static</span>
-											
-											
-											
-												<div class="meta">
-															<p>
-													</p>
-											
-											
-											
-												</div>
-											
-												<div class="description">
-													<p>Searches the object and all its children for resources that still dont exist in the resource manager.</p>
-											<p>Stores them in a resource container object that is returned.</p>
-											
-												</div>
-											
-													<div class="params">
-														<h4>Parameters:</h4>
-											
-														<ul class="params-list">
-															<li class="param">
-																	<code class="param-name">object</code>
-																	<span class="type">THREE.Object3D</span>
-											
-											
-																<div class="param-description">
-																	<p>Object to search for resources.</p>
-											
-																</div>
-											
-															</li>
-															<li class="param">
-																	<code class="param-name">manager</code>
-																	<span class="type"><a href="../classes/ResourceManager.html" class="crosslink">ResourceManager</a></span>
-											
-											
-																<div class="param-description">
-																	<p>Resource manager object.</p>
-											
-																</div>
-											
-															</li>
-															<li class="param">
-																	<code class="param-name">target</code>
-																	<span class="type">ResourceContainer</span>
-											
-											
-																<div class="param-description">
-																	<p>Optional resource container object that can be used to store the found resources.</p>
-											
-																</div>
-											
-															</li>
-														</ul>
-													</div>
-											
-													<div class="returns">
-														<h4>Returns:</h4>
-											
-														<div class="returns-description">
-																	<span class="type">ResourceContainer</span>:
-																<p>Object with the new resources found in the object.</p>
-											
-														</div>
-													</div>
-											
-											</div>
 									</div>
 						
 									<div id="properties" class="api-class-tabpanel">
@@ -1908,7 +1713,7 @@
 												</div>
 											
 												<div class="description">
-													<p>Images.</p>
+													<p>Image resources.</p>
 											
 												</div>
 											

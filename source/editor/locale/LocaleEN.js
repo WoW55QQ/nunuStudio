@@ -16,6 +16,7 @@ LocaleManager.register(
 	},
 
 	//Actions
+	reverse: "Reverse",
 	delete: "Delete",
 	copy: "Copy",
 	paste: "Paste",
@@ -23,6 +24,12 @@ LocaleManager.register(
 	duplicate: "Duplicate",
 	rename: "Rename",
 	renameObject: "Rename object",
+	renameMaterial: "Rename material",
+	renameTexture: "Rename texture",
+	renameFont: "Rename font",
+	deleteObjects: "Delete objects?",
+	deleteMaterial: "Delete material?",
+	deleteTexture: "Delete texture?",
 	select: "Select",
 	redo: "Redo",
 	undo: "Undo",
@@ -89,6 +96,7 @@ LocaleManager.register(
 	autoClearColor: "Auto Clear Color",
 	autoClearDepth: "Auto Clear Depth",
 	autoClearStencil: "Auto Clear Stencil",
+	checkShaderErrors: "Check Shaders",
 	clearColor: "Clear color",
 	clearDepth: "Clear depth",
 	clearStencil: "Clear stencil",
@@ -147,7 +155,20 @@ LocaleManager.register(
 	minFilter: "Min. filter",
 	magFilter: "Mag. filter",
 	flipY: "Flip Y",
-	
+	toneMapped: "Tone mapped",
+	text: "Text",
+	thickness: "Thickness",
+	bevel: "Bevel",
+	lineHeight: "Line Height",
+	letterSpacing: "Letter Spacing",
+	align: "Align",
+	smoothing: "Smoothing",
+	threshold: "Threshold",
+	shader: "Shader",
+	outline: "Outline",
+	outlineColor: "Outline color",
+	outlineWidth: "Outline Width",
+
 	//Values
 	relative: "Relative",
 	absolute: "Absolute",
@@ -232,7 +253,8 @@ LocaleManager.register(
 	scene: "Scene",
 	move: "Move",
 	play: "Play",
-	
+	selectObjects: "Select objects",
+
 	//Editor settings
 	reset: "Reset",
 	general: "General",
@@ -245,7 +267,9 @@ LocaleManager.register(
 	video: "Video",
 	file: "File",
 	material: "Material",
-	
+	geometry: "Geometry",
+	font: "Font",
+
 	//Run tab
 	toggleVR: "Toggle Virtual Reality",
 	toggleFullscreen: "Toggle Fullscreen",
@@ -256,7 +280,6 @@ LocaleManager.register(
 	projectExported: "Project exported",
 
 	//Confirm
-	deleteObjects: "Delete objects?",
 	loadProjectChangesLost: "All unsaved changes to the project will be lost.",
 	loadProject: "Load project?",
 	createProject: "Create new project?",
@@ -289,6 +312,7 @@ LocaleManager.register(
 	failedLoadSpine: "Failed to load Spine animation, make sure that .json and .atlas have the same name.",
 
 	//Hints renderer
+	hintCheckShaderErrors: "Defines whether material shader programs are checked for errors during compilation and linkage process.",
 	hintStencil: "Whether the drawing buffer has a stencil buffer of at least 8 bits.",
 	hintSortObjects: "If true the renderer sorts the objects from back to front for rendering. Important if using multiple transparent objects.",
 	hintAlpha: "Whether the canvas contains an alpha (transparency) buffer or not.",

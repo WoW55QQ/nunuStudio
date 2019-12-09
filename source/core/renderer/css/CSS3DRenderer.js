@@ -10,16 +10,25 @@
  * Based on the three.js adaptation (mrdoob, yomotsu) of http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
  * 
  * @class CSS3DRenderer
- * @param {DOM} domElement DOM division to place rendered objects.
+ * @param {Element} domElement DOM division to place rendered objects.
  */
 function CSS3DRenderer(domElement)
 {
-	//Size of the renderer
-	this.width = 2;
-	this.height = 2;
-	
-	this.widthHalf = 1;
-	this.heightHalf = 1;
+	/**
+	 * Size of the renderer viewport.
+	 *
+	 * @attribute size
+	 * @type {THREE.Vector2}
+	 */
+	this.size = new THREE.Vector2(2, 2);
+
+	/**
+	 * Size of the renderer viewport.
+	 *
+	 * @attribute size
+	 * @type {THREE.Vector2}
+	 */
+	this.halfSize = new THREE.Vector2(1, 1);
 
 	/**
 	 * Temporary matrix object.
@@ -45,7 +54,7 @@ function CSS3DRenderer(domElement)
 	 * Main DOM element used for the renderer.
 	 *
 	 * @attribute domElement
-	 * @type {DOM}
+	 * @type {Element}
 	 */
 	this.domElement = domElement !== undefined ? domElement : document.createElement("div");
 	this.domElement.style.overflow = "hidden";
@@ -55,7 +64,7 @@ function CSS3DRenderer(domElement)
 	 * Camera projected DOM element.
 	 *
 	 * @attribute domElement
-	 * @type {DOM}
+	 * @type {Element}
 	 */
 	this.cameraElement = document.createElement("div");
 	this.cameraElement.style.WebkitTransformStyle = "preserve-3d";
@@ -70,7 +79,7 @@ function CSS3DRenderer(domElement)
  */
 CSS3DRenderer.prototype.getSize = function()
 {
-	return {width: this.width, height: this.height};
+	return {width: this.size.x, height: this.size.y};
 };
 
 /**
@@ -79,15 +88,13 @@ CSS3DRenderer.prototype.getSize = function()
  * The size is also applie to the internal DOM division.
  *
  * @method setSize
- * @param {Number} width
- * @param {Number} height
+ * @param {number} width
+ * @param {number} height
  */
 CSS3DRenderer.prototype.setSize = function(width, height)
 {
-	this.width = width;
-	this.height = height;
-	this.widthHalf = this.width / 2;
-	this.heightHalf = this.height / 2;
+	this.size.set(width, height);
+	this.halfSize.set(width / 2, height / 2);
 
 	this.domElement.style.width = width + "px";
 	this.domElement.style.height = height + "px";
@@ -211,7 +218,7 @@ CSS3DRenderer.prototype.render = function(scene, camera)
 	}
 
 	//Get the effective camera fov from the projection matrix
-	var fov = camera.projectionMatrix.elements[5] * this.heightHalf;
+	var fov = camera.projectionMatrix.elements[5] * this.halfSize.y;
 
 	//If the camera fov is diferrent from the cached one ajust values.
 	if(this.cache.camera.fov !== fov)
@@ -250,7 +257,7 @@ CSS3DRenderer.prototype.render = function(scene, camera)
 		cameraCSSMatrix = "translateZ(" + fov + "px)" + getCameraCSSMatrix(camera.matrixWorldInverse);
 	}
 
-	var style = cameraCSSMatrix + "translate(" + this.widthHalf + "px," + this.heightHalf + "px)";
+	var style = cameraCSSMatrix + "translate(" + this.halfSize.x + "px," + this.halfSize.y + "px)";
 
 	//If the style is diferent from cache ajust style
 	if(this.cache.camera.style !== style)

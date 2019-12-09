@@ -5,6 +5,7 @@ include("lib/three/three.js");
 include("lib/three/QuickHull.js");
 include("lib/three/SimplexNoise.js");
 
+include("lib/three/shaders/AfterimageShader.js");
 include("lib/three/shaders/CopyShader.js");
 include("lib/three/shaders/BokehShader.js");
 include("lib/three/shaders/SAOShader.js");
@@ -33,8 +34,6 @@ include("lib/three/curves/NURBSSurface.js");
 include("lib/three/curves/NURBSUtils.js");
 
 include("lib/three/objects/Lensflare.js");
-include("lib/three/objects/Reflector.js");
-include("lib/three/objects/Refractor.js");
 
 include("lib/three/loaders/TTFLoader.js");
 
@@ -45,13 +44,14 @@ include("lib/pson/PSON.min.js");
 include("lib/three-bmfont.js");
 include("lib/cannon.min.js");
 include("lib/leap.min.js");
-include("lib/SPE.min.js");
 include("lib/spine.js");
 include("lib/opentype.min.js");
+include("lib/chevrotain.min.js");
 
 include("source/core/Nunu.js");
 include("source/core/Global.js");
 include("source/core/FileSystem.js");
+include("source/core/TargetConfig.js");
 
 include("source/core/three/animation/KeyframeTrack.js");
 include("source/core/three/animation/AnimationClip.js");
@@ -74,6 +74,11 @@ include("source/core/input/Mouse.js");
 include("source/core/input/Gamepad.js");
 include("source/core/input/Gyroscope.js");
 
+include("source/core/renderer/RendererConfiguration.js");
+include("source/core/renderer/css/CSS3DRenderer.js");
+include("source/core/renderer/css/CSS3DObject.js");
+include("source/core/renderer/css/CSS3DSprite.js");
+
 include("source/core/postprocessing/RendererState.js");
 include("source/core/postprocessing/Pass.js");
 include("source/core/postprocessing/ShaderPass.js");
@@ -81,6 +86,7 @@ include("source/core/postprocessing/EffectComposer.js");
 include("source/core/postprocessing/RenderPass.js");
 
 include("source/core/postprocessing/pass/antialiasing/FXAAPass.js");
+include("source/core/postprocessing/pass/AfterimagePass.js");
 include("source/core/postprocessing/pass/UnrealBloomPass.js");
 include("source/core/postprocessing/pass/BloomPass.js");
 include("source/core/postprocessing/pass/SSAONOHPass.js");
@@ -96,9 +102,6 @@ include("source/core/postprocessing/pass/HueSaturationPass.js");
 include("source/core/postprocessing/pass/AdaptiveToneMappingPass.js");
 
 include("source/core/postprocessing/shaders/SSAOShader.js");
-
-include("source/core/vr/VRControls.js");
-include("source/core/vr/VREffect.js");
 
 include("source/core/resources/Resource.js");
 include("source/core/resources/Font.js");
@@ -130,11 +133,16 @@ include("source/core/loaders/ObjectLoader.js");
 
 include("source/core/objects/device/LeapMotion.js");
 include("source/core/objects/device/KinectDevice.js");
+
 include("source/core/objects/mesh/Mesh.js");
 include("source/core/objects/mesh/SkinnedMesh.js");
+
+include("source/core/objects/sprite/CanvasSprite.js");
+include("source/core/objects/sprite/Sprite.js");
+
 include("source/core/objects/text/TextMesh.js");
 include("source/core/objects/text/TextBitmap.js");
-include("source/core/objects/sprite/Sprite.js");
+include("source/core/objects/text/TextSprite.js");
 
 include("source/core/objects/lights/PointLight.js");
 include("source/core/objects/lights/SpotLight.js");
@@ -146,22 +154,37 @@ include("source/core/objects/lights/RectAreaLight.js");
 include("source/core/objects/cameras/Viewport.js");
 include("source/core/objects/cameras/PerspectiveCamera.js");
 include("source/core/objects/cameras/OrthographicCamera.js");
+include("source/core/objects/cameras/CubeCamera.js");
 
 include("source/core/objects/audio/AudioEmitter.js");
 include("source/core/objects/audio/PositionalAudio.js");
+
 include("source/core/objects/script/Script.js");
+
 include("source/core/objects/physics/PhysicsObject.js");
+
 include("source/core/objects/spine/SpineAnimation.js");
 include("source/core/objects/spine/SpineTexture.js");
+
+include("source/core/objects/particle/core/ParticleEmitterControl.js");
+include("source/core/objects/particle/core/ParticleGroup.js");
+include("source/core/objects/particle/core/ShaderUtils.js");
+include("source/core/objects/particle/helpers/ShaderAttribute.js");
+include("source/core/objects/particle/helpers/TypedArrayHelper.js");
+include("source/core/objects/particle/shaders/ParticleShaderChunks.js");
+include("source/core/objects/particle/shaders/ParticleShaders.js");
 include("source/core/objects/particle/ParticleEmitter.js");
+
 include("source/core/objects/misc/Sky.js");
 include("source/core/objects/misc/Container.js");
-include("source/core/objects/misc/CubeCamera.js");
 include("source/core/objects/misc/LensFlare.js");
+include("source/core/objects/misc/BrowserView.js");
+
 include("source/core/objects/animation/Skeleton.js");
+
 include("source/core/objects/controls/OrbitControls.js");
 include("source/core/objects/controls/FirstPersonControls.js");
-include("source/core/objects/RendererConfiguration.js");
+
 include("source/core/objects/Program.js");
 include("source/core/objects/Scene.js");
 
@@ -186,7 +209,7 @@ include("source/core/utils/PhysicsGenerator.js");
  * @class NunuApp
  * @module Runtime
  * @constructor
- * @param {DOM} canvas Canvas to be used by the runtime, if no canvas is provided a new one is created and added to the document.body, to create a new NunuApp without canvas a null value can be passed.
+ * @param {Element} canvas Canvas to be used by the runtime, if no canvas is provided a new one is created and added to the document.body, to create a new NunuApp without canvas a null value can be passed.
  */
 function NunuApp(canvas)
 {
@@ -208,7 +231,7 @@ function NunuApp(canvas)
 	 * Runtime control, if true the app is running.
 	 * 
 	 * @property running
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	this.running = false;
 
@@ -226,7 +249,7 @@ function NunuApp(canvas)
 	/**
 	 * Canvas used to render graphics.
 	 * @property canvas
-	 * @type {DOM}
+	 * @type {Element}
 	 */
 	this.canvas = canvas;
 
@@ -256,8 +279,8 @@ function NunuApp(canvas)
  *
  * @static
  * @method loadApp
- * @param {URL} url URL for the nsp or isp nunuStudio file.
- * @param {String} canvas Canvas object or canvas id.
+ * @param {string} url URL for the nsp or isp nunuStudio file.
+ * @param {string} canvas Canvas object or canvas id.
  */
 NunuApp.loadApp = function(url, canvas)
 {	
@@ -354,7 +377,7 @@ NunuApp.prototype.run = function()
  * Load program asynchronously and run it after its loaded.
  * 
  * @method loadRunProgram
- * @param {String} fname Name of the file to load
+ * @param {string} fname Name of the file to load
  * @param {Function} onLoad onLoad callback
  * @param {Function} onProgress onProgress callback
  */
@@ -375,7 +398,7 @@ NunuApp.prototype.loadRunProgram = function(fname, onLoad, onProgress)
  * Load program from file.
  * 
  * @method loadProgram
- * @param {String} fname Name of the file to load
+ * @param {string} fname Name of the file to load
  */
 NunuApp.prototype.loadProgram = function(fname)
 {
@@ -400,7 +423,7 @@ NunuApp.prototype.loadProgram = function(fname)
  * Load program from file, asynchronously.
  * 
  * @method loadProgramAsync
- * @param {String} fname Name of the file to load
+ * @param {string} fname Name of the file to load
  * @param {Function} onLoad onLoad callback. Receives as argument the loaded application.
  * @param {Function} onProgress onProgress callback
  */
@@ -523,18 +546,9 @@ NunuApp.prototype.resume = function()
 			if(self.running)
 			{
 				self.update();
-
-				if(self.program.useVR)
-				{
-					self.program.display.requestAnimationFrame(update);
-				}
-				else
-				{
-					requestAnimationFrame(update);
-				}
+				requestAnimationFrame(update);
 			}
 		};
-
 		this.running = true;
 		update();
 	}
@@ -556,7 +570,7 @@ NunuApp.prototype.pause = function()
  * Should be set before starting the program.
  *
  * @method setCanvas
- * @param {DOM} canvas Canvas
+ * @param {Element} canvas Canvas
  */
 NunuApp.prototype.setCanvas = function(canvas)
 {
@@ -655,7 +669,7 @@ NunuApp.prototype.setOnExit = function(callback)
  */
 NunuApp.prototype.vrAvailable = function()
 {
-	return this.program !== null && this.program.vr && Nunu.webvrAvailable();	
+	return this.program !== null && this.program.vrAvailable();
 };
 
 /**
@@ -667,18 +681,18 @@ NunuApp.prototype.toggleVR = function()
 {
 	if(this.vrAvailable())
 	{
-		if(this.program.useVR)
+		if(this.program.vrRunning)
 		{
 			this.program.exitVR();
 		}
 		else
 		{
-			this.program.displayVR();
+			this.program.enterVR();
 		}
 	}
 	else
 	{
-		console.warn("nunuStudio: loaded program is not VR enabled");
+		console.warn("nunuStudio: Loaded program is not VR enabled.");
 	}
 };
 
@@ -686,7 +700,7 @@ NunuApp.prototype.toggleVR = function()
  * Set a element to fullscreen mode, if none is passed the rendering canvas is used.
  *
  * @method toggleFullscreen
- * @param {DOM} element DOM element to go fullscren by default the rendering canvas is used
+ * @param {Element} element DOM element to go fullscren by default the rendering canvas is used
  */
 NunuApp.prototype.toggleFullscreen = function(element)
 {

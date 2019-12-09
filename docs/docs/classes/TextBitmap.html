@@ -32,6 +32,7 @@
 						</ul>
 						<div id="api-tabview-panel">
 							<ul id="api-classes" class="apis classes">
+								<li><a href="../classes/AfterimagePass.html">AfterimagePass</a></li>
 								<li><a href="../classes/AmbientLight.html">AmbientLight</a></li>
 								<li><a href="../classes/AnimationMixer.html">AnimationMixer</a></li>
 								<li><a href="../classes/AnimationTimer.html">AnimationTimer</a></li>
@@ -42,6 +43,7 @@
 								<li><a href="../classes/Base64Utils.html">Base64Utils</a></li>
 								<li><a href="../classes/BloomPass.html">BloomPass</a></li>
 								<li><a href="../classes/BokehPass.html">BokehPass</a></li>
+								<li><a href="../classes/BrowserView.html">BrowserView</a></li>
 								<li><a href="../classes/BufferUtils.html">BufferUtils</a></li>
 								<li><a href="../classes/ByteArrayUtils.html">ByteArrayUtils</a></li>
 								<li><a href="../classes/CanvasSprite.html">CanvasSprite</a></li>
@@ -92,7 +94,11 @@
 								<li><a href="../classes/ObjectUtils.html">ObjectUtils</a></li>
 								<li><a href="../classes/OrbitControls.html">OrbitControls</a></li>
 								<li><a href="../classes/OrthographicCamera.html">OrthographicCamera</a></li>
+								<li><a href="../classes/ParticleDistributions.html">ParticleDistributions</a></li>
 								<li><a href="../classes/ParticleEmitter.html">ParticleEmitter</a></li>
+								<li><a href="../classes/ParticleEmitterControl.html">ParticleEmitterControl</a></li>
+								<li><a href="../classes/ParticleEmitterControlOptions.html">ParticleEmitterControlOptions</a></li>
+								<li><a href="../classes/ParticleGroup.html">ParticleGroup</a></li>
 								<li><a href="../classes/Pass.html">Pass</a></li>
 								<li><a href="../classes/PerspectiveCamera.html">PerspectiveCamera</a></li>
 								<li><a href="../classes/PhysicsGenerator.html">PhysicsGenerator</a></li>
@@ -108,7 +114,9 @@
 								<li><a href="../classes/ResourceManager.html">ResourceManager</a></li>
 								<li><a href="../classes/Scene.html">Scene</a></li>
 								<li><a href="../classes/Script.html">Script</a></li>
+								<li><a href="../classes/ShaderAttribute.html">ShaderAttribute</a></li>
 								<li><a href="../classes/ShaderPass.html">ShaderPass</a></li>
+								<li><a href="../classes/ShaderUtils.html">ShaderUtils</a></li>
 								<li><a href="../classes/Skeleton.html">Skeleton</a></li>
 								<li><a href="../classes/SkinnedMesh.html">SkinnedMesh</a></li>
 								<li><a href="../classes/Sky.html">Sky</a></li>
@@ -121,6 +129,7 @@
 								<li><a href="../classes/SSAONOHPass.html">SSAONOHPass</a></li>
 								<li><a href="../classes/SSAOPass.html">SSAOPass</a></li>
 								<li><a href="../classes/SSAOShader.html">SSAOShader</a></li>
+								<li><a href="../classes/TargetConfig.html">TargetConfig</a></li>
 								<li><a href="../classes/TechnicolorPass.html">TechnicolorPass</a></li>
 								<li><a href="../classes/TextBitmap.html">TextBitmap</a></li>
 								<li><a href="../classes/TextFile.html">TextFile</a></li>
@@ -132,14 +141,15 @@
 								<li><a href="../classes/TizenKeyboard.html">TizenKeyboard</a></li>
 								<li><a href="../classes/Tree.html">Tree</a></li>
 								<li><a href="../classes/TreeUtils.html">TreeUtils</a></li>
+								<li><a href="../classes/TypedArrayHelper.html">TypedArrayHelper</a></li>
 								<li><a href="../classes/UnrealBloomPass.html">UnrealBloomPass</a></li>
 								<li><a href="../classes/Video.html">Video</a></li>
 								<li><a href="../classes/VideoLoader.html">VideoLoader</a></li>
 								<li><a href="../classes/VideoStream.html">VideoStream</a></li>
 								<li><a href="../classes/VideoTexture.html">VideoTexture</a></li>
 								<li><a href="../classes/Viewport.html">Viewport</a></li>
-								<li><a href="../classes/VRControls.html">VRControls</a></li>
 								<li><a href="../classes/WebcamTexture.html">WebcamTexture</a></li>
+								<li><a href="../classes/{Object} ParticleGroupOptions.html">{Object} ParticleGroupOptions</a></li>
 							</ul>
 				
 							<ul id="api-modules" class="apis modules">
@@ -167,7 +177,6 @@
 								<li><a href="../modules/Textures.html">Textures</a></li>
 								<li><a href="../modules/THREE.html">THREE</a></li>
 								<li><a href="../modules/Utils.html">Utils</a></li>
-								<li><a href="../modules/VirtualReality.html">VirtualReality</a></li>
 							</ul>
 						</div>
 					</div>
@@ -246,6 +255,10 @@
 														<a href="#method_updateGeometry">updateGeometry</a>
 						
 													</li>
+													<li class="index-item method">
+														<a href="#method_updateShader">updateShader</a>
+						
+													</li>
 											</ul>
 										</div>
 						
@@ -276,6 +289,9 @@
 														<a href="#attr_font">font</a>
 													</li>
 													<li class="index-item attr">
+														<a href="#attr_fontScale">fontScale</a>
+													</li>
+													<li class="index-item attr">
 														<a href="#attr_LEFT">LEFT</a>
 													</li>
 													<li class="index-item attr">
@@ -283,9 +299,6 @@
 													</li>
 													<li class="index-item attr">
 														<a href="#attr_lineHeight">lineHeight</a>
-													</li>
-													<li class="index-item attr">
-														<a href="#attr_mode">mode</a>
 													</li>
 													<li class="index-item attr">
 														<a href="#attr_MSDF">MSDF</a>
@@ -303,13 +316,22 @@
 														<a href="#attr_SDF_SHADER">SDF_SHADER</a>
 													</li>
 													<li class="index-item attr">
+														<a href="#attr_shader">shader</a>
+													</li>
+													<li class="index-item attr">
 														<a href="#attr_smoothing">smoothing</a>
 													</li>
 													<li class="index-item attr">
 														<a href="#attr_text">text</a>
 													</li>
 													<li class="index-item attr">
+														<a href="#attr_texture">texture</a>
+													</li>
+													<li class="index-item attr">
 														<a href="#attr_threshold">threshold</a>
+													</li>
+													<li class="index-item attr">
+														<a href="#attr_uniforms">uniforms</a>
 													</li>
 													<li class="index-item attr">
 														<a href="#attr_VERTEX_SHADER">VERTEX_SHADER</a>
@@ -396,8 +418,36 @@
 												</div>
 											
 												<div class="description">
-													<p>Update the text bitmap geometry.</p>
+													<p>Update the text bitmap geometry to match config.</p>
 											<p>Should be called every time after changes to configuration are made.</p>
+											
+												</div>
+											
+											
+											
+											</div>
+											<div id="method_updateShader" class="method item">
+												<h3 class="name"><code>updateShader</code></h3>
+											
+													<span class="paren">()</span>
+											
+											
+											
+											
+											
+											
+											
+											
+												<div class="meta">
+															<p>
+													</p>
+											
+											
+											
+												</div>
+											
+												<div class="description">
+													<p>Update the shader used to draw the bitmap information in the screen.</p>
 											
 												</div>
 											
@@ -623,6 +673,33 @@
 											
 											
 											</div>
+											<div id="attr_fontScale" class="attr item">
+												<a name="config_fontScale"></a> 
+												<h3 class="name"><code>fontScale</code></h3>
+												<span class="type">Number</span>
+											
+											
+											
+											
+											
+											
+											
+											
+												<div class="meta">
+															<p>
+													</p>
+											
+											
+												</div>
+											
+												<div class="description">
+													<p>Scale applied to the generated text geometry.</p>
+											
+												</div>
+											
+											
+											
+											</div>
 											<div id="attr_LEFT" class="attr item">
 												<a name="config_LEFT"></a> 
 												<h3 class="name"><code>LEFT</code></h3>
@@ -699,38 +776,6 @@
 											
 												<div class="description">
 													<p>Space between each text line.</p>
-											
-												</div>
-											
-											
-											
-											</div>
-											<div id="attr_mode" class="attr item">
-												<a name="config_mode"></a> 
-												<h3 class="name"><code>mode</code></h3>
-												<span class="type">Number</span>
-											
-											
-											
-											
-											
-											
-											
-											
-												<div class="meta">
-															<p>
-													</p>
-											
-											
-												</div>
-											
-												<div class="description">
-													<p>Text bitmap rendering mode, can be:</p>
-											<ul>
-											<li>TextBitmap.BITMAP</li>
-											<li>TextBitmap.SDF</li>
-											<li>TextBitmap.MSDF</li>
-											</ul>
 											
 												</div>
 											
@@ -887,6 +932,38 @@
 											
 											
 											</div>
+											<div id="attr_shader" class="attr item">
+												<a name="config_shader"></a> 
+												<h3 class="name"><code>shader</code></h3>
+												<span class="type">Number</span>
+											
+											
+											
+											
+											
+											
+											
+											
+												<div class="meta">
+															<p>
+													</p>
+											
+											
+												</div>
+											
+												<div class="description">
+													<p>Text bitmap rendering shader, can be:</p>
+											<ul>
+											<li>TextBitmap.BITMAP</li>
+											<li>TextBitmap.SDF</li>
+											<li>TextBitmap.MSDF</li>
+											</ul>
+											
+												</div>
+											
+											
+											
+											</div>
 											<div id="attr_smoothing" class="attr item">
 												<a name="config_smoothing"></a> 
 												<h3 class="name"><code>smoothing</code></h3>
@@ -941,10 +1018,38 @@
 											
 											
 											</div>
+											<div id="attr_texture" class="attr item">
+												<a name="config_texture"></a> 
+												<h3 class="name"><code>texture</code></h3>
+												<span class="type">THREE.Texture</span>
+											
+											
+											
+											
+											
+											
+											
+											
+												<div class="meta">
+															<p>
+													</p>
+											
+											
+												</div>
+											
+												<div class="description">
+													<p>Texture containing the bitmap characters.</p>
+											<p>Data specifiyng the position of each character in the texture should be placed in the font.</p>
+											
+												</div>
+											
+											
+											
+											</div>
 											<div id="attr_threshold" class="attr item">
 												<a name="config_threshold"></a> 
 												<h3 class="name"><code>threshold</code></h3>
-												<span class="type">THREE.Color</span>
+												<span class="type">Number</span>
 											
 											
 											
@@ -962,6 +1067,33 @@
 											
 												<div class="description">
 													<p>SDF distance alpha threshold.</p>
+											
+												</div>
+											
+											
+											
+											</div>
+											<div id="attr_uniforms" class="attr item">
+												<a name="config_uniforms"></a> 
+												<h3 class="name"><code>uniforms</code></h3>
+												<span class="type">Object</span>
+											
+											
+											
+											
+											
+											
+											
+											
+												<div class="meta">
+															<p>
+													</p>
+											
+											
+												</div>
+											
+												<div class="description">
+													<p>Uniforms passed to the text rendering shaders.</p>
 											
 												</div>
 											

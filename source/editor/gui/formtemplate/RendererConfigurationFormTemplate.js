@@ -24,7 +24,7 @@ function RendererConfigurationFormTemplate(form, object)
 
 			if(tab instanceof SceneEditor)
 			{
-				tab.reloadContext();
+				tab.canvas.reloadContext();
 			}
 		}
 	};
@@ -158,7 +158,6 @@ function RendererConfigurationFormTemplate(form, object)
 	this.form.add(this.stencil);
 	this.form.nextRow();
 
-
 	this.form.addText(Locale.sortObjects).setAltText(Locale.hintSortObjects);
 	this.sortObjects = new CheckBox(this.form);
 	this.sortObjects.size.set(18, 18);
@@ -168,7 +167,6 @@ function RendererConfigurationFormTemplate(form, object)
 	});
 	this.form.add(this.sortObjects);
 	this.form.nextRow();
-
 
 	//Shadows
 	this.form.addText(Locale.shadows);
@@ -188,6 +186,7 @@ function RendererConfigurationFormTemplate(form, object)
 	this.shadowsType.addValue("Basic", THREE.BasicShadowMap);
 	this.shadowsType.addValue("PCF", THREE.PCFShadowMap);
 	this.shadowsType.addValue("PCF Soft", THREE.PCFSoftShadowMap);
+	this.shadowsType.addValue("VSM", VSMShadowMap);
 	this.shadowsType.setOnChange(function()
 	{
 		Editor.addAction(new CallbackAction(new ChangeAction(self.object, "shadowsType", self.shadowsType.getValue()), updateRenderers));
@@ -310,6 +309,17 @@ function RendererConfigurationFormTemplate(form, object)
 	});
 	this.form.add(this.toneMappingWhitePoint);
 	this.form.nextRow();
+
+	//Check shader errors
+	this.form.addText(Locale.checkShaderErrors).setAltText(Locale.hintCheckShaderErrors);
+	this.checkShaderErrors = new CheckBox(this.form);
+	this.checkShaderErrors.size.set(18, 18);
+	this.checkShaderErrors.setOnChange(function()
+	{
+		Editor.addAction(new CallbackAction(new ChangeAction(self.object, "checkShaderErrors", self.checkShaderErrors.getValue()), updateRenderers));
+	});
+	this.form.add(this.checkShaderErrors);
+	this.form.nextRow();
 }
 
 RendererConfigurationFormTemplate.prototype = Object.create(FormTemplate.prototype);
@@ -340,4 +350,5 @@ RendererConfigurationFormTemplate.prototype.updateValues = function()
 	this.powerPreference.setValue(this.object.powerPreference);
 	this.logarithmicDepthBuffer.setValue(this.object.logarithmicDepthBuffer);
 	this.physicallyCorrectLights.setValue(this.object.physicallyCorrectLights);
+	this.checkShaderErrors.setValue(this.object.checkShaderErrors);
 };

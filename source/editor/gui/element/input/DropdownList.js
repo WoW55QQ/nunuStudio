@@ -10,6 +10,7 @@ function DropdownList(parent)
 	this.select.style.color = Editor.theme.textColor;
 	this.select.style.left = "0px";
 	this.select.style.top = "0px";
+	this.select.style.textIndent = "5px";
 	this.select.style.borderStyle = "none";
 	this.select.style.boxSizing = "border-box";
 	this.select.style.borderRadius = "4px";
@@ -41,7 +42,7 @@ DropdownList.prototype = Object.create(Element.prototype);
  * Set the disabled state of the element.
  *
  * @method setDisabled
- * @param {Boolean} disabled
+ * @param {boolean} disabled
  */
 DropdownList.prototype.setDisabled = function(value)
 {
@@ -59,7 +60,13 @@ DropdownList.prototype.setOnChange = function(onChange)
 	this.select.onchange = onChange;
 }
 
-//Add element
+/**
+ * Add option to the dropdown list.
+ *
+ * @method addValue
+ * @param {string} text Label of the option.
+ * @param {Object} value Value of the option.
+ */
 DropdownList.prototype.addValue = function(text, value)
 {
 	var option = document.createElement("option");
@@ -68,7 +75,11 @@ DropdownList.prototype.addValue = function(text, value)
 	this.select.appendChild(option);
 }
 
-//Remove all element from dropdown
+/**
+ * Remove all element from dropdown
+ *
+ * @method clearValues
+ */
 DropdownList.prototype.clearValues = function()
 {
 	this.values = [];

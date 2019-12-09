@@ -8,19 +8,19 @@
  * @class RendererCanvas
  * @extends {Element}
  * @param {Element} parent Parent element.
- * @param {Boolean} alpha If true the background is transparent.
+ * @param {boolean} alpha If true the background is transparent.
  */
-function RendererCanvas(parent, alpha)
+function RendererCanvas(parent, options, useCSSRenderer)
 {
 	Element.call(this, parent, "div");
 
-	/**
-	 * Indicates if the background of the canvas is transparent or not.
+	/** 
+	 * List os parameters to be passed to the WebGLrenderer.
 	 *
-	 * @attribute alpha
-	 * @type {Boolean}
+	 * @attribute options
+	 * @type {Object}
 	 */
-	this.alpha = alpha !== undefined ? alpha : false;
+	this.options = options !== undefined ? options : new RendererConfiguration();
 
 	/**
 	 * On resize callback, called every time the container is updated.
@@ -31,10 +31,52 @@ function RendererCanvas(parent, alpha)
 	this.onResize = null;
 
 	/**
+	 * Indicates if a CSS renderer should be created alongside the WebGL renderer.
+	 *
+	 * @attribute useCSSRenderer
+	 * @type {boolean}
+	 */
+	this.useCSSRenderer = useCSSRenderer !== undefined ? useCSSRenderer : true;
+
+	/**
+	 * CSS renderer used alongside.
+	 *
+	 * @attribute cssRenderer
+	 * @type {CSS3DObject}
+	 */
+	this.cssRenderer = null;
+
+	/**
+	 * Overlay division used to place the css rendered DOM objects.
+	 *
+	 * @attribute cssDivision
+	 * @type {Element}
+	 */
+	this.cssDivision = null;
+
+	/**
+	 * Rendering resolution accouting for the device pixel ratio.
+	 *
+	 * @attribute resolution
+	 * @type {THREE.Vector2}
+	 */
+	this.resolution = new THREE.Vector2();
+
+	/**
+	 * Method called when the canvas is reset, might need to be used to replace canvas related events.
+	 *
+	 * Receives the RendererCanvas object as argument.
+	 *
+	 * @attribute onCanvasReset
+	 * @type {Function}
+	 */
+	this.onCanvasReset = null;
+
+	/**
 	 * Canvas DOM element.
 	 * 
 	 * @attribute canvas
-	 * @type {DOM}
+	 * @type {Element}
 	 */
 	this.canvas = null;
 	this.resetCanvas();
@@ -93,24 +135,63 @@ RendererCanvas.prototype.resetCanvas = function()
 		this.element.insertBefore(this.canvas, this.element.firstChild);
 	}
 
+	if(this.element.contains(this.cssDivision))
+	{
+		this.element.removeChild(this.cssDivision);
+	}
+
+	if(this.useCSSRenderer)
+	{
+		this.cssDivision = document.createElement("div");
+		this.cssDivision.style.position = "absolute";
+		this.cssDivision.style.display = "block";
+		this.cssDivision.style.top = "0px";
+		this.cssDivision.style.left = "0px";
+		this.element.appendChild(this.cssDivision);
+	}
+
 	this.resizeCanvas();
+
+	if(this.onCanvasReset !== null)
+	{
+		this.onCanvasReset(this);
+	}
 };
 
 /**
- * Create WebGL renderer.
+ * Creates a new threejs WebGL renderer.
+ * 
+ * The renderer is created with the options specified on the object, always uses the canvas attached to the component.
+ *
+ * The user has to ensure that the old context was disposed before creating a new renderer.
  * 
  * @method createRenderer
  */
 RendererCanvas.prototype.createRenderer = function()
 {
-	var rendererConfig = Editor.settings.render.followProject ? Editor.program.rendererConfig : Editor.settings.render;
-	var alpha = rendererConfig.alpha;
-	rendererConfig.alpha = this.alpha;
+	//Create renderer
+	this.renderer = this.options.createRenderer(this.canvas);
 
-	this.renderer = rendererConfig.createRenderer(this.canvas);
-	this.renderer.alpha = this.alpha;
-	
-	rendererConfig.alpha = alpha;
+	//CSS Renderer
+	if(this.useCSSRenderer)
+	{
+		this.cssRenderer = new CSS3DRenderer(this.cssDivision);
+	}
+};
+
+/**
+ * Get blob with data present on this rendering canvas.
+ *
+ * If the preserveDrawingBuffer is set to false.
+ *
+ * @method getBlob
+ * @param {Function} onLoad Blob load callback.
+ * @param {string} encoding Image encoding.
+ * @param {number} quality Quality of the JPEG encoding is used.
+ */
+RendererCanvas.prototype.getBlob = function(onLoad, encoding, quality)
+{
+	this.canvas.toBlob(onLoad, encoding !== undefined ? encoding : "image/jpeg", quality !== undefined ? quality : 0.7);
 };
 
 /**
@@ -162,17 +243,23 @@ RendererCanvas.prototype.forceContextLoss = function()
  */
 RendererCanvas.prototype.resizeCanvas = function()
 {
-	var width = this.size.x * window.devicePixelRatio;
-	var height = this.size.y * window.devicePixelRatio;
+	this.resolution.copy(this.size);
+	this.resolution.multiplyScalar(window.devicePixelRatio);
 
-	this.canvas.width = width;
-	this.canvas.height = height;
+	this.canvas.width = this.resolution.x;
+	this.canvas.height = this.resolution.y;
 	this.canvas.style.width = this.size.x + "px";
 	this.canvas.style.height = this.size.y + "px";
 
+	if(this.useCSSRenderer)
+	{
+		this.cssDivision.style.width = this.size.x + "px";
+		this.cssDivision.style.height = this.size.y + "px";
+	}
+
 	if(this.onResize !== null)
 	{
-		this.onResize(width, height);
+		this.onResize(this.resolution.x, this.resolution.y);
 	}
 };
 
@@ -188,6 +275,14 @@ RendererCanvas.prototype.updateSize = function()
 	Element.prototype.updateSize.call(this);
 
 	this.resizeCanvas();
-	
-	this.renderer.setSize(this.size.x, this.size.y, false);
+
+	if(this.renderer !== null)
+	{
+		this.renderer.setSize(this.size.x, this.size.y, false);
+	}
+
+	if(this.useCSSRenderer)
+	{
+		this.cssRenderer.setSize(this.size.x, this.size.y);
+	}
 };

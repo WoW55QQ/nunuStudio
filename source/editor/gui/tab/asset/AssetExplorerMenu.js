@@ -10,7 +10,7 @@ function AssetExplorerMenu(parent)
 	//Import
 	var menu = new DropdownMenu(this);
 	menu.setText(Locale.import);
-	menu.size.set(100, 20);
+	menu.size.set(100, 25);
 	menu.position.set(0, 0);
 
 	//3D Models Loader
@@ -38,7 +38,7 @@ function AssetExplorerMenu(parent)
 	}, Global.FILE_PATH + "icons/misc/font.png");
 
 	//Load text
-	menu.addOption("Text", function()
+	menu.addOption(Locale.text, function()
 	{
 		FileSystem.chooseFile(function(files)
 		{
@@ -70,23 +70,7 @@ function AssetExplorerMenu(parent)
 			{
 				for(var i = 0; i < files.length; i++)
 				{
-					try
-					{
-						var file = files[i].path;
-						
-						var json = FileSystem.readFile(file);
-						var atlas = FileSystem.readFile(file.replace("json", "atlas"));
-						var path = FileSystem.getFilePath(file);
-						
-						var animation = new SpineAnimation(json, atlas, path);
-						animation.name = FileSystem.getFileName(file);
-
-						Editor.addObject(animation);
-					}
-					catch(e)
-					{
-						Editor.alert(Locale.failedLoadSpine + "(" + e + ")");
-					}
+					Editor.loadSpineAnimation(files[i]);
 				}
 			}, ".json, .spine");
 		}, Global.FILE_PATH + "icons/misc/spine.png");
@@ -97,7 +81,7 @@ function AssetExplorerMenu(parent)
 	//Textures
 	var texture = new DropdownMenu(this);
 	texture.setText("Texture");
-	texture.size.set(100, 20);
+	texture.size.set(100, 25);
 	texture.position.set(100, 0);
 
 	//Image texture
@@ -149,6 +133,7 @@ function AssetExplorerMenu(parent)
 	texture.addOption("Canvas Texture", function()
 	{
 		var texture = new CanvasTexture(512, 512);
+		texture.placeholder();
 		texture.name = "canvas";
 		Editor.addAction(new AddResourceAction(texture, Editor.program, "textures"));
 	}, Global.FILE_PATH + "icons/misc/canvas.png");
@@ -178,7 +163,7 @@ function AssetExplorerMenu(parent)
 	//Material
 	var material = new DropdownMenu(this);
 	material.setText(Locale.material);
-	material.size.set(100, 20);
+	material.size.set(100, 25);
 	material.position.set(200, 0);
 	
 	material.addOption("Standard material", function()
@@ -312,7 +297,7 @@ function AssetExplorerMenu(parent)
 	//Create menu
 	var create = new DropdownMenu(this);
 	create.setText("Create");
-	create.size.set(100, 20);
+	create.size.set(100, 25);
 	create.position.set(300, 0);
 	
 	create.addOption("HTML", function()

@@ -8,9 +8,9 @@
  * @class TreeView
  * @extends {TabElement}
  * @param {Element} parent Parent element.
- * @param {Boolean} closeable If the tab is closeable.
+ * @param {boolean} closeable If the tab is closeable.
  * @param {TabGroup} container The container where this tab is inserted.
- * @param {Number} index Index inside the container button array.
+ * @param {number} index Index inside the container button array.
  */
 function TreeView(parent, closeable, container, index)
 {	
@@ -22,10 +22,10 @@ function TreeView(parent, closeable, container, index)
 	this.element.style.backgroundColor = null;
 
 	this.search = new SearchBox(this);
-	this.search.element.style.backgroundColor = Editor.theme.barColor;;
+	this.search.element.style.backgroundColor = Editor.theme.barColor;
 	this.search.setOnChange(function()
-	{
-		self.selectByName(this.value);
+	{	
+		self.selectByName(self.search.search.getText());
 	});
 
 	this.program = null;
@@ -40,7 +40,7 @@ TreeView.prototype = Object.create(TabElement.prototype);
  * All nodes that contain the name will be selected.
  *
  * @method selectByName
- * @param {String} name String with portion of the name to be found and filtered.
+ * @param {string} name String with portion of the name to be found and filtered.
  */
 TreeView.prototype.selectByName = function(search)
 {
@@ -121,7 +121,7 @@ TreeView.prototype.traverse = function(callback)
  * @method addObject
  * @param {THREE.Object3D} object New object to add to the tree.
  * @param {THREE.Object3D} parent Parent to insert the object.
- * @param {Number} index Index to insert the object.
+ * @param {number} index Index to insert the object.
  */
 TreeView.prototype.addObject = function(object, parent, index)
 {
@@ -194,7 +194,7 @@ TreeView.prototype.removeObject = function(object, parent)
  * @param {THREE.Object3D} object New object to add to the tree.
  * @param {THREE.Object3D} oldParent Old parent to remove the object from.
  * @param {THREE.Object3D} newParent New parent to insert the object into.
- * @param {Number} index New index to insert the object.
+ * @param {number} index New index to insert the object.
  */
 TreeView.prototype.moveObject = function(object, oldParent, newParent, index)
 {
@@ -296,7 +296,7 @@ TreeView.prototype.updateChildPosition = function()
 
 	if(this.root !== null)
 	{
-		this.root.position.set(0, 22);
+		this.root.position.set(0, this.search.size.y);
 		this.root.updateInterface();
 
 		this.size.y = updateChildPosition(this.root, 42, 1, this.root.folded);
@@ -307,6 +307,6 @@ TreeView.prototype.updateSize = function()
 {
 	TabElement.prototype.updateSize.call(this);
 
-	this.search.size.set(this.size.x, 20);
+	this.search.size.set(this.size.x, 25);
 	this.search.updateInterface();
 };

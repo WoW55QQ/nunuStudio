@@ -122,6 +122,7 @@ function MainMenu(parent)
 				}
 				catch(e)
 				{
+					console.error("nunuStudio: Error exporting android project.", e);
 					Editor.alert(Locale.errorExportingProject + "\n(" + e + ")");
 				}
 			});
@@ -136,15 +137,16 @@ function MainMenu(parent)
 					}
 					catch(e)
 					{
+						console.error("nunuStudio: Error exporting android project.", e);
 						Editor.alert(Locale.errorExportingProject + "\n(" + e + ")");
 					}
 				}, ".apk", Editor.program.name);
 			});
 		}
 
-		//Publish windows
-		if(Editor.canExportWindows())
+		if(Nunu.runningOnDesktop())
 		{
+			//Publish windows
 			publish.addOption("Windows", function()
 			{
 				FileSystem.chooseFile(function(files)
@@ -156,15 +158,13 @@ function MainMenu(parent)
 					}
 					catch(e)
 					{
+						console.error("nunuStudio: Error exporting windows project.", e);
 						Editor.alert(Locale.errorExportingProject + "\n(" + e + ")");
 					}
 				}, "", Editor.program.name);
 			}, Global.FILE_PATH + "icons/platform/windows.png");
-		}
 
-		//Publish linux
-		if(Editor.canExportLinux())
-		{
+			//Publish linux
 			publish.addOption("Linux", function()
 			{
 				FileSystem.chooseFile(function(files)
@@ -176,15 +176,14 @@ function MainMenu(parent)
 					}
 					catch(e)
 					{
+						console.error("nunuStudio: Error exporting linux project.", e);
 						Editor.alert(Locale.errorExportingProject + "\n(" + e + ")");
 					}
 				}, "", Editor.program.name);
 			}, Global.FILE_PATH + "icons/platform/linux.png");
-		}
+	
 
-		//Publish macos
-		if(Editor.canExportMacOS())
-		{
+			//Publish macos
 			publish.addOption("macOS", function()
 			{
 				FileSystem.chooseFile(function(files)
@@ -196,6 +195,7 @@ function MainMenu(parent)
 					}
 					catch(e)
 					{
+						console.error("nunuStudio: Error exporting macOS project.", e);
 						Editor.alert(Locale.errorExportingProject + "\n(" + e + ")");
 					}
 				}, "", Editor.program.name);
@@ -216,6 +216,7 @@ function MainMenu(parent)
 				}
 				catch(e)
 				{
+					console.error("nunuStudio: Error exporting web project.", e);
 					Editor.alert(Locale.errorExportingProject + "\n(" + e + ")");
 				}
 			}, ".zip");
@@ -314,8 +315,7 @@ function MainMenu(parent)
 					var exporter = new THREE.GLTFExporter();
 					exporter.parse(Editor.getScene(), function(result)
 					{
-						var data = JSON.stringify(result, null, 2);
-						FileSystem.writeFile(files[0].path, data);
+						FileSystem.writeFile(files[0].path, JSON.stringify(result, null, "\t"));
 					});
 				}
 			}, ".gltf", true);
@@ -328,8 +328,7 @@ function MainMenu(parent)
 				var exporter = new THREE.GLTFExporter();
 				exporter.parse(Editor.getScene(), function(result)
 				{
-					var data = JSON.stringify(result, null, 2);
-					FileSystem.writeFile(fname, data);
+					FileSystem.writeFile(fname, JSON.stringify(result, null, "\t"));
 				})
 			}, ".gltf");
 		}

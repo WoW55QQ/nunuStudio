@@ -8,17 +8,17 @@
  * @class CanvasTexture
  * @extends {Texture}
  * @module Textures
- * @param {Number} width Canvas width
- * @param {Number} height Canvas height
- * @param {Number} mapping
- * @param {Number} wrapS
- * @param {Number} wrapT
- * @param {Number} magFilter
- * @param {Number} minFilter
- * @param {Number} format
- * @param {Number} type
- * @param {Number} anisotropy
- * @param {Number} encoding
+ * @param {number} width Canvas width
+ * @param {number} height Canvas height
+ * @param {number} mapping
+ * @param {number} wrapS
+ * @param {number} wrapT
+ * @param {number} magFilter
+ * @param {number} minFilter
+ * @param {number} format
+ * @param {number} type
+ * @param {number} anisotropy
+ * @param {number} encoding
  */
 function CanvasTexture(width, height, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding)
 {
@@ -26,7 +26,7 @@ function CanvasTexture(width, height, mapping, wrapS, wrapT, magFilter, minFilte
 	 * Image is used to store a DOM canvas element.
 	 * 
 	 * @property image
-	 * @type {DOM}
+	 * @type {Element}
 	 */
 	THREE.Texture.call(this, document.createElement("canvas"), mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding);
 
@@ -34,21 +34,35 @@ function CanvasTexture(width, height, mapping, wrapS, wrapT, magFilter, minFilte
 	this.category = "Canvas";
 	this.format = THREE.RGBAFormat;
 
-	/**
-	 * Canvas width.
-	 * 
-	 * @property width
-	 * @type {Number}
-	 */
-	this.width = (width !== undefined) ? width : 512;
+	Object.defineProperties(this,
+	{
+		/**
+		 * Canvas width, internal resolution of the canvas texture.
+		 * 
+		 * @property width
+		 * @type {number}
+		 */
+		width:
+		{
+			get: function(){return this.image.width;},
+			set: function(value){this.image.width = value;}
+		},
 
-	/**
-	 * Canvas height.
-	 * 
-	 * @property height
-	 * @type {Number}
-	 */
-	this.height = (height !== undefined) ? height : 512;
+		/**
+		 * Canvas height, internal resolution of the canvas texture.
+		 * 
+		 * @property height
+		 * @type {number}
+		 */
+		height:
+		{
+			get: function(){return this.image.height;},
+			set: function(value){this.image.height = value;}
+		}
+	});
+
+	this.width = (width !== undefined) ? width : 1;
+	this.height = (height !== undefined) ? height : 1;
 
 	/**
 	 * Canvas context 2D, can be used to draw content do the canvas texture.
@@ -57,32 +71,24 @@ function CanvasTexture(width, height, mapping, wrapS, wrapT, magFilter, minFilte
 	 * @type {Context2D}
 	 */
 	this.context = this.image.getContext("2d");
-	this.updateSize();
 }
 
 CanvasTexture.prototype = Object.create(THREE.Texture.prototype);
+CanvasTexture.prototype.isCanvasTexture = true;
 
 /**
- * Update the size of the canvas texture.
- *
- * The texture is image is reset to the default.
- *
- * Should be called after changing the width or height properties.
+ * Draw a placeholder figure into the canvas texture.
  * 
- * @method updateSize
+ * @method placeholder
  */
-CanvasTexture.prototype.updateSize = function()
+CanvasTexture.prototype.placeholder = function()
 {	
-	this.image.width = this.width;
-	this.image.height = this.height;
-
 	this.context.fillStyle = "#000000";
 	this.context.fillRect(0, 0, this.width, this.height);
 	this.context.font = "Normal " + Math.round(this.width / 12) +  "px Arial";
 	this.context.textAlign = "center";
 	this.context.fillStyle = "#FF0000";
 	this.context.fillText("Canvas Texture", this.width/2, this.height/2);
-
 	this.needsUpdate = true;
 };
 
@@ -92,12 +98,19 @@ CanvasTexture.prototype.updateSize = function()
  * Uses the internal context to draw a rect to fill the canvas.
  *
  * @method clear
- * @param {String} color
+ * @param {string} color
  */
 CanvasTexture.prototype.clear = function(color)
 {
-	this.context.fillStyle = color;
-	this.context.fillRect(0, 0, this.width, this.height);
+	if(color === undefined)
+	{
+		this.context.clearRect(0, 0, width, height);
+	}
+	else
+	{
+		this.context.fillStyle = color;
+		this.context.fillRect(0, 0, this.width, this.height);
+	}
 };
 
 /**

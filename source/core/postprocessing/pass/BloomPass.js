@@ -6,10 +6,10 @@
  * @class BloomPass
  * @author alteredq / http://alteredqualia.com/
  * @module Postprocessing
- * @param {Number} strength  Bloom effect strength.
- * @param {Number} kernelSize Bloom kernel size.
- * @param {Number} sigma Sigma.
- * @param {Number} resolution Bloom buffer resolution.
+ * @param {number} strength  Bloom effect strength.
+ * @param {number} kernelSize Bloom kernel size.
+ * @param {number} sigma Sigma.
+ * @param {number} resolution Bloom buffer resolution.
  */
 function BloomPass(strength, kernelSize, sigma, resolution)
 {
@@ -88,12 +88,16 @@ BloomPass.prototype.render = function(renderer, writeBuffer, readBuffer, delta, 
 	this.quad.material = this.materialConvolution;
 	this.convolutionUniforms["tDiffuse"].value = readBuffer.texture;
 	this.convolutionUniforms["uImageIncrement"].value = BloomPass.blurX;
+	renderer.setRenderTarget(this.renderTargetX);
+	renderer.clear(true, true, true);
 	renderer.render(this.scene, this.camera, this.renderTargetX, true);
 
 	//Render quad with blured scene into texture (convolution pass 2)
 	this.convolutionUniforms["tDiffuse"].value = this.renderTargetX.texture;
 	this.convolutionUniforms["uImageIncrement"].value = BloomPass.blurY;
-	renderer.render(this.scene, this.camera, this.renderTargetY, true);
+	renderer.setRenderTarget(this.renderTargetY);
+	renderer.clear(true, true, true);
+	renderer.render(this.scene, this.camera);
 
 	//Render original scene with superimposed blur to texture
 	this.quad.material = this.materialCopy;

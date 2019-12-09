@@ -14,13 +14,13 @@ function PreviewRenderer()
 	 * @type {THREE.WebGLRenderer}
 	 */
 	this.renderer = new THREE.WebGLRenderer({alpha: true});
-	this.renderer.setSize(64, 64);
+	this.renderer.setSize(128, 128);
 	
 	/**
 	 * DOM canvas where the result is rendered to.
 	 *
 	 * @attribute canvas
-	 * @type {DOM}
+	 * @type {Element}
 	 */
 	this.canvas = this.renderer.domElement;
 	
@@ -49,8 +49,8 @@ PreviewRenderer.prototype.render = function(resource, onRender){};
  * Set thumbnail renderer size.
  *
  * @method setSize
- * @param {Number} x
- * @param {Number} y
+ * @param {number} x
+ * @param {number} y
  */
 PreviewRenderer.prototype.setSize = function(x, y)
 {

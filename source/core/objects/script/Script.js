@@ -31,7 +31,7 @@
  * 
  * @class Script
  * @extends {Object}
- * @param {String} code Javascript code to be used by this script
+ * @param {string} code Javascript code to be used by this script
  * @module Script
  */
 function Script(code, mode)
@@ -45,7 +45,7 @@ function Script(code, mode)
 	 * Javascript code attached to the script.
 	 *
 	 * @property code
-	 * @type {String}
+	 * @type {string}
 	 */
 	this.code = (code !== undefined) ? code : Script.DEFAULT;
 
@@ -55,7 +55,7 @@ function Script(code, mode)
 	 * Can be Script.APPEND, Script.EVALUATE or Script.INCLUDE.
 	 *
 	 * @property mode
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.mode = (mode !== undefined) ? mode : Script.APPEND;
 
@@ -90,13 +90,15 @@ Script.prototype = Object.create(THREE.Group.prototype);
 
 /**
  * Default script code used when creating a new Script.
+ *
  * @attribute DEFAULT
- * @type {String}
+ * @type {string}
  */
 Script.DEFAULT = "function initialize()\n{\n	//TODO <INITIALIZATION CODE>\n}\n\nfunction update(delta)\n{\n	//TODO <UPDATE CODE>\n}\n";
 
 /**
- * List of methods that a script can implement.
+ * List of default methods that can be implemented by scripts.
+ *
  * @attribute METHODS
  * @type {Array}
  */
@@ -108,7 +110,7 @@ Script.METHODS = ["initialize", "update", "dispose", "onMouseOver", "onResize", 
  * Libraries are appended to the script code on initialization.
  *
  * @attribute APPEND
- * @type {Number}
+ * @type {number}
  */
 Script.APPEND = 100;
 
@@ -118,7 +120,7 @@ Script.APPEND = 100;
  * This allows to load new libs during runtime, but its not possible to access private statements.
  *
  * @attribute EVALUATE
- * @type {Number}
+ * @type {number}
  */
 Script.EVALUATE = 101;
 
@@ -128,7 +130,7 @@ Script.EVALUATE = 101;
  * This imports the JS file as any other file included into a <script> tag.
  *
  * @attribute INCLUDE
- * @type {Number}
+ * @type {number}
  */
 Script.INCLUDE = 102;
 
@@ -140,7 +142,7 @@ Script.INCLUDE = 102;
  * Global declarations need to be cleaned using the dipose method.
  *
  * @method include
- * @param {String} name Javascript resource name.
+ * @param {string} name Javascript resource name.
  */
 
 /**
@@ -150,7 +152,7 @@ Script.INCLUDE = 102;
  *
  * @static
  * @method getIncludes
- * @param {String} code Script code.
+ * @param {string} code Script code.
  */
 Script.getIncludes = function(code)
 {
@@ -176,7 +178,7 @@ Script.getIncludes = function(code)
  *
  * @static
  * @method removeIncludes
- * @param {String} code Script code.
+ * @param {string} code Script code.
  */
 Script.removeIncludes = function(code)
 {
@@ -184,9 +186,10 @@ Script.removeIncludes = function(code)
 }
 
 /**
- * Initialize script
- * Automatically called by the runtime
- * Calls the script initialize method if it exists
+ * Initialize script. Automatically called by the runtime.
+ *
+ * Compiles the script code and calls the script initialize method if it exists after the code is compiled.
+ *
  * @method initialize
  */
 Script.prototype.initialize = function()
@@ -298,7 +301,7 @@ Script.prototype.appData = function(data)
  * Can be used to dinamically change the script code. However it is not recommended can lead to undefined behavior.
  * 
  * @method compileCode
- * @param {String} code
+ * @param {string} code
  * @param {Function} onReady Funtion called when the code is ready.
  */
 Script.prototype.compileCode = function(code, onReady)

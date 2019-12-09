@@ -1,5 +1,6 @@
 <img src="https://raw.githubusercontent.com/tentone/nunuStudio/master/docs/img/github/logo.png">
 
+[![GitHub version](https://badge.fury.io/gh/tentone%2FnunuStudio.svg)](https://badge.fury.io/gh/tentone%2FnunuStudio)
 [![GitHub issues](https://img.shields.io/github/issues/tentone/nunuStudio.svg)](https://github.com/tentone/nunuStudio/issues) [![GitHub stars](https://img.shields.io/github/stars/tentone/nunuStudio.svg)](https://github.com/tentone/nunuStudio/stargazers)
 
  - nunustudio is an open source 3D VR game engine for the web it allows designers and web developers to easily develop 3D experiences that can run directly in a web page or be exported as Desktop applications.
@@ -9,31 +10,15 @@
 
 
 ## Web Editor
- - There is a fully featured web version of the editor available at https://nunustudio.org/editor/editor
+ - There is a fully featured web version of the editor available at https://nunustudio.org/editor
  - The web version was tested with Firefox, Chrome and Microsoft Edge, mobile browsers are not supported.
 
 <img src="https://raw.githubusercontent.com/tentone/nunuStudio/master/docs/img/github/web.png">
 
 ## Documentation
  - Documentation for the scripting API is available on the nunu webpage https://nunustudio.org/docs
- - nunuStudio was documented using YUIDocs
-
-
-
-## Features
-- Visual application editor
-- Built on three.js
-  - Real time lighting and shadow map support
-  - three.js code can be used inside nunuStudio scripts without the need for THREE prefix
-- Wide range of file formats supported
-- TTF Font support
-- Drag and drop files directly to objects
-- One file only project export with all assets included
-  - No more broken projects because of missing files
-- NWJS and Cordova used for easy desktop and mobile deployment
-- Physics engine (cannon.js)
-- SPE particle system
-- Compatible with WebVR V1.1
+    - nunuStudio was documented using YUIDocs
+ - Tutorials available on the project page at <https://nunustudio.org/learn.html>
 
 
 
@@ -41,6 +26,22 @@
 <img src="https://raw.githubusercontent.com/tentone/nunuStudio/master/docs/img/github/2.png"><img src="https://raw.githubusercontent.com/tentone/nunuStudio/master/docs/img/github/3.png">
 <img src="https://raw.githubusercontent.com/tentone/nunuStudio/master/docs/img/github/4.png"><img src="https://raw.githubusercontent.com/tentone/nunuStudio/master/docs/img/github/1.png">
 <img src="https://raw.githubusercontent.com/tentone/nunuStudio/master/docs/img/github/5.png"><img src="https://raw.githubusercontent.com/tentone/nunuStudio/master/docs/img/github/6.png">
+
+
+
+## Features
+
+- Visual application editor
+  - Drag and drop files directly into the project
+  - Manage project resources
+  - Edit material, textures, shaders, code, etc
+- Built on three.js rendering library
+  - Real time lighting and shadow map support
+  - three.js code can be used inside nunuStudio scripts without the need for THREE prefix
+  - Wide range of file formats supported
+- NWJS and Cordova exports for desktop and mobile deployment
+- Physics engine (cannon.js)
+- Compatible with WebVR / WebXR
 
 
 
@@ -74,6 +75,7 @@
   - SPE ([github.com/squarefeet/ShaderParticleEngine](https://github.com/squarefeet/ShaderParticleEngine))
   - JSColor ([jscolor.com](http://jscolor.com))
   - CodeMirror ([codemirror.net](https://codemirror.net))
+  - Spine Runtime (<https://github.com/EsotericSoftware/spine-runtimes>)
   - LeapJS ([github.com/leapmotion/leapjs](https://github.com/leapmotion/leapjs))
   - JSHint ([jshint.com](https://jshint.com))
   - YUIDocs ([yui.github.io/yuidoc](https://yui.github.io/yuidoc))

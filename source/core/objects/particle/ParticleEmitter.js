@@ -14,26 +14,22 @@
 function ParticleEmitter(group, emitter)
 {
 	/**
-	 * SPE Group instance.
-	 * 
-	 * https://squarefeet.github.io/ShaderParticleEngine/docs/api/SPE.Group.html
+	 * Particle group instance.
 	 * 
 	 * @property group
-	 * @type {SPE.Group}
+	 * @type {ParticleGroup}
 	 */
-	this.group = new SPE.Group(group !== undefined ? group : ParticleEmitter.defaultGroup);
+	this.group = new ParticleGroup(group !== undefined ? group : ParticleEmitter.defaultGroup);
 
 	/**
-	 * SPE Emitter instance.
+	 * Emitter instance.
 	 * 
 	 * Emitter has attributes that can be used to controll the particle system
 	 * 
-	 * https://squarefeet.github.io/ShaderParticleEngine/docs/api/SPE.Emitter.html
-	 * 
 	 * @property emitter
-	 * @type {SPE.Emitter}
+	 * @type {ParticleEmitterControl}
 	 */
-	this.emitter = new SPE.Emitter(emitter !== undefined ? emitter : ParticleEmitter.defaultEmitter);
+	this.emitter = new ParticleEmitterControl(emitter !== undefined ? emitter : ParticleEmitter.defaultEmitter);
 	this.group.addEmitter(this.emitter);
 
 	THREE.Points.call(this, this.group.geometry, this.group.material);
@@ -46,7 +42,7 @@ function ParticleEmitter(group, emitter)
 	 * A dynamic particle emmiter ignores the position in its transform and applies it directly to the emitter origin.
 	 *
 	 * @property dinamicEmitter
-	 * @type {Boolean} 
+	 * @type {boolean} 
 	 */
 	this.dynamicEmitter = false;
 
@@ -69,6 +65,55 @@ function ParticleEmitter(group, emitter)
 		}
 	});
 }
+
+/**
+ * A map of supported distribution types used by ParticleEmitterControl instances.
+ *
+ * These distribution types can be applied to an emitter globally, which will affect the position, velocity, and acceleration value calculations for an emitter, or they can be applied on a per-property basis.
+ *
+ * @class ParticleDistributions
+ */
+var ParticleDistributions = {
+	/**
+	 * Values will be distributed within a box.
+	 *
+	 * @attribute BOX
+	 * @type {number}
+	 */
+	BOX: 1,
+
+	/**
+	 * Values will be distributed on a sphere.
+	 *
+	 * @attribute SPHERE
+	 * @type {number}
+	 */
+	SPHERE: 2,
+
+	/**
+	 * Values will be distributed on a 2d-disc shape.
+	 *
+	 * @attribute DISC
+	 * @type {number}
+	 */
+	DISC: 3,
+};
+
+
+/**
+ * Set this value to however many "steps" you want value-over-lifetime properties to have.
+ *
+ * Its adjustable to fix an interpolation problem:
+ *
+ * Assuming you specify an opacity value as [0, 1, 0] and the valueOverLifetimeLength is 4, then the opacity value array will be reinterpolated to be [0, 0.66, 0.66, 0].
+ * This isn't ideal, as particles would never reach full opacity.
+ *
+ * This property affects the length of ALL value-over-lifetime properties for ALL  emitters and ALL groups. Only values >= 3 && <= 4 are allowed.
+ *
+ * @attribute valueOverLifetimeLength
+ * @type {number}
+ */
+ParticleEmitter.valueOverLifetimeLength = 4;
 
 ParticleEmitter.prototype = Object.create(THREE.Points.prototype);
 
@@ -222,96 +267,5 @@ ParticleEmitter.prototype.toJSON = function(meta)
 	return data;
 };
 
-SPE.Group.prototype.toJSON = function(meta)
-{
-	var data = {};
 
-	data.texture = {};
-	data.texture.value = this.texture.uuid;
-	data.texture.frames = this.textureFrames.toArray();
-	data.texture.frameCount = this.textureFrameCount
-	data.texture.loop = this.textureLoop;
-	data.fixedTimeStep = this.fixedTimeStep;
-	data.hasPerspective = this.hasPerspective;
-	data.colorize = this.colorize;
-	data.maxParticleCount = this.maxParticleCount;
-	data.transparent = this.transparent;
-	data.blending = this.blending;
-	data.alphaTest = this.alphaTest;
-	data.depthWrite = this.depthWrite;
-	data.depthTest = this.depthTest;
-	data.fog = this.fog;
-	data.scale = this.scale;
 
-	return data;
-};
-
-SPE.Emitter.prototype.toJSON = function(meta)
-{
-	var data = {};
-
-	data.uuid = this.uuid;
-	data.type = this.type;
-	data.direction = this.direction;
-	data.particleCount = this.particleCount;
-	data.duration = this.duration;
-	data.isStatic = this.isStatic;
-
-	//Max age
-	data.maxAge = {};
-	data.maxAge.value = this.maxAge.value;
-	data.maxAge.spread = this.maxAge.spread;
-
-	//Position
-	data.position = {};
-	data.position.value = this.position.value.toArray();
-	data.position.spread = this.position.spread.toArray();
-	data.position.radius = this.position.radius;
-	data.position.radiusScale = this.position.radiusScale.toArray();
-
-	//Velocity
-	data.velocity = {};
-	data.velocity.value = this.velocity.value.toArray();
-	data.velocity.spread = this.velocity.spread.toArray();
-
-	//Acceleration
-	data.acceleration = {};
-	data.acceleration.value = this.acceleration.value.toArray();
-	data.acceleration.spread = this.acceleration.spread.toArray();
-
-	//Wiggle
-	data.wiggle = {};
-	data.wiggle.value = this.wiggle.value;
-	data.wiggle.spread = this.wiggle.spread;
-
-	//Opacity
-	data.opacity = {};
-	data.opacity.value = this.opacity.value.slice(0);
-	data.opacity.spread = this.opacity.spread;
-
-	//Size
-	data.size = {};
-	data.size.value = this.size.value.slice(0);
-	data.size.spread = this.size.spread;
-
-	//Angle
-	data.angle = {};
-	data.angle.value = this.angle.value.slice(0);
-	data.angle.spread = this.angle.spread;
-
-	//Color
-	data.color = {};
-	data.color.value = [];
-	for(var i = 0; i < this.color.value.length; i++)
-	{
-		data.color.value.push(this.color.value[i].getHex());
-	}
-
-	data.color.spread = [];
-	for(var i = 0; i < this.color.spread.length; i++)
-	{
-		data.color.spread.push(this.color.spread[i].toArray());
-	}
-
-	return data;
-};

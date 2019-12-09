@@ -33,7 +33,7 @@ function ResourceManager()
 ResourceManager.ResourceContainer = function()
 {
 	/**
-	 * Images.
+	 * Image resources.
 	 * 
 	 * @property images
 	 * @type {Array}
@@ -141,264 +141,29 @@ ResourceManager.prototype.dispose = function()
 };
 
 /**
- * Searches the object and all its children for resources that still dont exist in the resource manager.
- *
- * Stores them in a resource container object that is returned.
- *
- * @static
- * @method searchObject
- * @param {THREE.Object3D} object Object to search for resources.
- * @param {ResourceManager} manager Resource manager object.
- * @param {ResourceContainer} target Optional resource container object that can be used to store the found resources.
- * @return {ResourceContainer} Object with the new resources found in the object.
+ * Remove geometry from the list and replace by other.
+ * 
+ * @method removeGeometry
+ * @param {Resource} geometry
  */
-ResourceManager.searchObject = function(object, manager, target)
+ResourceManager.prototype.removeGeometry = function(geometry, defaultGeometry)
 {
-	var resources;
-
-	if(target !== undefined)
+	this.traverse(function(child)
 	{
-		resources = target;
-	}
-	else
-	{
-		resources = new ResourceManager.ResourceContainer();
-	}
-	
-	object.traverse(function(child)
-	{
-		if(child.locked)
+		if(child.geometry !== undefined && child.geometry.uuid === geometry.uuid)
 		{
-			return;
-		}
-
-		//Fonts
-		if(child.font instanceof Font)
-		{
-			if(manager.fonts[child.font.uuid] === undefined)
-			{
-				resources.fonts[child.font.uuid] = child.font;
-			}
-		}
-
-		//Audio
-		if(child.audio instanceof Audio)
-		{
-			if(manager.audio[child.audio.uuid] === undefined)
-			{
-				resources.audio[child.audio.uuid] = child.audio;
-			}
-		}
-
-		//Material/textures
-		if(child.material !== undefined && !(child instanceof LensFlare || child instanceof ParticleEmitter || child instanceof Sky || child instanceof SpineAnimation))
-		{
-			if(child.material instanceof THREE.Material)
-			{
-				addMaterial(child.material);
-			}
-			else if(child.material instanceof Array)
-			{
-				for(var j = 0; j < child.material.length; j++)
-				{
-					addMaterial(child.material[j]);
-				}
-			}
-			else if(child.materials instanceof Array)
-			{
-				for(var j = 0; j < child.materials.length; j++)
-				{
-					addMaterial(child.materials[j]);
-				}
-			}
-			else if(child.material instanceof THREE.MultiMaterial)
-			{
-				var materials = child.material.materials;
-				for(var j = 0; j < materials.length; j++)
-				{
-					addMaterial(materials[j]);
-				}
-			}
-		}
-
-		//Geometries
-		if(child instanceof THREE.Mesh || child instanceof THREE.SkinnedMesh)
-		{
-			if(child.geometry.type === "BufferGeometry" || child.geometry.type === "Geometry")
-			{
-				if(manager.geometries[child.geometry.uuid] === undefined)
-				{
-					resources.geometries[child.geometry.uuid] = child.geometry;
-				}			
-			}
-		}
-
-		//Textures
-		if(child.texture !== undefined)
-		{
-			addTexture(child.texture);
-		}
-		if(child instanceof LensFlare)
-		{
-			for(var i = 0; i < child.elements.length; i++)
-			{
-				addTexture(child.elements[i].texture);
-			}
+			child.geometry = defaultGeometry;
 		}
 	});
 
-	function addMaterial(material)
-	{
-		addTexturesFromMaterial(material);
-
-		if(manager.materials[material.uuid] === undefined)
-		{
-			resources.materials[material.uuid] = material;
-		}
-	}
-
-	function addTexturesFromMaterial(material)
-	{
-		addTexture(material.map);
-		addTexture(material.bumpMap);
-		addTexture(material.normalMap);
-		addTexture(material.displacementMap);
-		addTexture(material.specularMap);
-		addTexture(material.emissiveMap);
-		addTexture(material.alphaMap);
-		addTexture(material.roughnessMap);
-		addTexture(material.metalnessMap);
-		addTexture(material.envMap);
-	}
-
-	function addTexture(texture)
-	{
-		if(texture !== null && texture !== undefined)
-		{
-			addResourcesTexture(texture);
-
-			if(manager.textures[texture.uuid] === undefined)
-			{
-				resources.textures[texture.uuid] = texture;	
-			}
-		}
-	}
-
-	function addImage(image)
-	{
-		if(manager.images[image.uuid] === undefined)
-		{
-			resources.images[image.uuid] = image;
-		}
-	}
-
-	function addResourcesTexture(texture)
-	{
-		//Image
-		if(texture.img instanceof Image)
-		{
-			addImage(texture.img);
-		}
-		//Video
-		if(texture.video instanceof Video)
-		{
-			if(manager.videos[texture.video.uuid] === undefined)
-			{
-				resources.videos[texture.video.uuid] = texture.video;
-			}
-		}
-		//Images array
-		if(texture.images !== undefined)
-		{
-			for(var i = 0; i < texture.images.length; i++)
-			{
-				addImage(texture.images[i]);
-			}
-		}
-	}
-
-	for(var i in manager.materials)
-	{
-		addTexturesFromMaterial(manager.materials[i]);
-	}
-
-	for(var i in manager.textures)
-	{
-		addResourcesTexture(manager.textures[i]);
-	}
-
-	return resources;
-};
-
-/**
- * Add resource (of any type) to category.
- *
- * @method addRes
- * @param {Resource} resource
- * @param {String} category
- */
-ResourceManager.prototype.addRes = function(resource, category)
-{
-	this[category][resource.uuid] = resource;
-};
-
-ResourceManager.prototype.getResByName = function(name)
-{
-	for(var category in this)
-	{
-		for(var resources in category)
-		{
-			if(resources[i].name === name)
-			{
-				return resources[i];
-			}
-		}
-	}
-
-	return null;
-};
-
-/**
- * Remove resource of any type from category.
- *
- * @method removeRes
- * @param {Resource} resource
- * @param {String} category
- * @param {Object} defaultResource
- * @param {Object} defaultSubResource
- */ 
-ResourceManager.prototype.removeRes = function(resource, category, defaultResource, defaultSubResource)
-{
-	if(category === "materials")
-	{
-		this.removeMaterial(resource, defaultResource, defaultSubResource);
-	}
-	else if(category === "textures")
-	{
-		this.removeTexture(resource, defaultResource);
-	}
-	else if(category === "fonts")
-	{
-		this.removeFont(resource, defaultResource);
-	}
-	else if(category === "audio")
-	{
-		this.removeAudio(resource, defaultResource);
-	}
-	else
-	{
-		if(this[category] !== undefined && this[category][resource.uuid] !== undefined)
-		{
-			delete this[category][resource.uuid];
-		}
-	}
+	delete this.geometries[geometry.uuid];
 };
 
 /**
  * Get resource by name.
  * 
  * @method getResourceByName
- * @param {String} name Resource name
+ * @param {string} name Resource name
  * @return {Resource} Resource if found else null
  */
 ResourceManager.prototype.getResourceByName = function(name)
@@ -444,7 +209,7 @@ ResourceManager.prototype.removeResource = function(resource)
  * Get image by name.
  * 
  * @method getImageByName
- * @param {String} name Image name
+ * @param {string} name Image name
  * @return {Image} Image if found else null
  */
 ResourceManager.prototype.getImageByName = function(name)
@@ -480,7 +245,7 @@ ResourceManager.prototype.removeImage = function(image)
  * Get video by name.
  * 
  * @method getVideoByName
- * @param {String} name Video name
+ * @param {string} name Video name
  * @return {Video} Video if found else null
  */
 ResourceManager.prototype.getVideoByName = function(name)
@@ -515,7 +280,7 @@ ResourceManager.prototype.removeVideo = function(video)
  * Get material by its name.
  * 
  * @method getMaterialByName
- * @param {String} name Material name
+ * @param {string} name Material name
  * @return {Material} Material if found else null
  */
 ResourceManager.prototype.getMaterialByName = function(name)
@@ -591,7 +356,7 @@ ResourceManager.prototype.removeMaterial = function(material, defaultMeshMateria
  * Get texture by name.
  * 
  * @method getTextureByName
- * @param {String} name Texture name.
+ * @param {string} name Texture name.
  * @return {Texture} Texture is found else null.
  */
 ResourceManager.prototype.getTextureByName = function(name)
@@ -713,7 +478,7 @@ ResourceManager.prototype.removeTexture = function(texture, defaultTexture)
  * Get font by name.
  * 
  * @method getFontByName
- * @param {String} name
+ * @param {string} name
  * @return {Font} Font if found, else null
  */
 ResourceManager.prototype.getFontByName = function(name)
@@ -776,7 +541,7 @@ ResourceManager.prototype.removeFont = function(font, defaultFont)
  * Get audio by name.
  * 
  * @method getAudioByName
- * @param {String} name
+ * @param {string} name
  * @return {Audio} Audio if found, else null
  */
 ResourceManager.prototype.getAudioByName = function(name)
@@ -808,7 +573,7 @@ ResourceManager.prototype.addAudio = function(audio)
 };
 
 /**
- * Remove audio.
+ * Remove audio resource from the manager, replace on objects that are using it with another resource.
  * 
  * @param {Audio} audio
  * @param {Audio} defaultAudio

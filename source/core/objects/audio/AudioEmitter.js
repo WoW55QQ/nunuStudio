@@ -51,7 +51,7 @@ function AudioEmitter(audio)
 	 *  - audioNode
 	 *
 	 * @property sourceType
-	 * @type {String}
+	 * @type {string}
 	 * @default {"empty"}
 	 */
 	this.sourceType = "empty";
@@ -78,7 +78,7 @@ function AudioEmitter(audio)
 	 *
 	 * @property volume
 	 * @default 1.0
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.volume = 1.0;
 
@@ -87,7 +87,7 @@ function AudioEmitter(audio)
 	 *
 	 * @property playbackRate
 	 * @default 1.0
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.playbackRate = 1.0;
 
@@ -96,9 +96,9 @@ function AudioEmitter(audio)
 	 *
 	 * @property startTime
 	 * @default 0.0
-	 * @type {Number}
+	 * @type {number}
 	 */
-	this.startTime = 0;
+	this.startTime = 0.0;
 
 	/**
 	 * If true the audio plays in loop.
@@ -113,21 +113,102 @@ function AudioEmitter(audio)
 	 * Modify pitch, measured in cents. +/- 100 is a semitone. +/- 1200 is an octave.
 	 *
 	 * @property detune
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.detune = 0;
 
 	this.isPlaying = false;
 	this.hasPlaybackControl = true;
+
+	this.filters = [];
 }
 
-THREE._Audio = THREE.Audio;
 THREE.Audio = AudioEmitter;
 
-AudioEmitter.prototype = Object.create(THREE._Audio.prototype);
+AudioEmitter.prototype = Object.create(THREE.Object3D.prototype);
 
 /**
- * Initialize audio object, loads audio data decodes it and starts playback if autoplay is set to True.
+ * Possible source types for the audio emitter.
+ *
+ * @static
+ * @attribute SOURCE
+ * @type {Object}
+ */
+AudioEmitter.SOURCE = {
+	EMPTY: "empty",
+	BUFFER: "buffer",
+	NODE: "audioNode"
+}
+
+/**
+ * Method called when the audio playback stoped.
+ *
+ * @method onEnded
+ */
+AudioEmitter.prototype.onEnded = function()
+{
+	this.isPlaying = false;
+};
+
+/**
+ * Connect the audio source.
+ *
+ * Used internally on initialisation and when setting / removing
+ *
+ * @method connect
+ */
+AudioEmitter.prototype.connect = function()
+{
+	if(this.filters.length > 0)
+	{
+		this.source.connect(this.filters[0]);
+
+		for (var i = 1, l = this.filters.length; i < l; i ++)
+		{
+			this.filters[i - 1].connect(this.filters[i]);
+		}
+
+		this.filters[this.filters.length - 1].connect(this.getOutput());
+	}
+	else
+	{
+		this.source.connect(this.getOutput());
+	}
+
+	return this;
+
+};
+
+/**
+ * Disconnect the audio source.
+ *
+ * Used internally when setting / removing filters.
+ *
+ * @method disconnect
+ */
+AudioEmitter.prototype.disconnect = function()
+{
+	if(this.filters.length > 0)
+	{
+		this.source.disconnect(this.filters[0]);
+
+		for (var i = 1, l = this.filters.length; i < l; i ++)
+		{
+			this.filters[i - 1].disconnect(this.filters[i]);
+		}
+
+		this.filters[this.filters.length - 1].disconnect(this.getOutput());
+	}
+	else
+	{
+		this.source.disconnect(this.getOutput());
+	}
+
+	return this;
+};
+
+/**
+ * Initialize audio object, loads audio data decodes it and starts playback ifautoplay is set to True.
  * 
  * @method initialize
  */
@@ -230,7 +311,7 @@ AudioEmitter.prototype.pause = function()
 AudioEmitter.prototype.stop = function()
 {
 	this.source.stop();
-	this.startTime = 0;
+	this.startTime = 0.0;
 	this.isPlaying = false;
 
 	return this;
@@ -268,7 +349,7 @@ AudioEmitter.prototype.setAudio = function(audio)
 /**
  * Get audio emitter volume.
  * 
- * @param {Number} volume
+ * @param {number} volume
  * @method getVolume
  */
 AudioEmitter.prototype.getVolume = function()
@@ -280,7 +361,7 @@ AudioEmitter.prototype.getVolume = function()
  * Set audio emitter volume.
  * 
  * @method setVolume
- * @param {Number} value Audio volume
+ * @param {number} value Audio volume
  * @return {AudioEmitter} Self pointer for chaining.
  */
 AudioEmitter.prototype.setVolume = function(value)
@@ -314,7 +395,7 @@ AudioEmitter.prototype.setLoop = function(loop)
  * Set detune value.
  * 
  * @method setDetune
- * @param {Number} value
+ * @param {number} value
  * @return {AudioEmitter} Self pointer for chaining.
  */
 AudioEmitter.prototype.setDetune = function(value)
@@ -344,7 +425,7 @@ AudioEmitter.prototype.getLoop = function()
  * Set playback speed.
  * 
  * @method setPlaybackRate
- * @param {Number} speed
+ * @param {number} speed
  * @return {AudioEmitter} Self pointer for chaining.
  */
 AudioEmitter.prototype.setPlaybackRate = function (speed)
@@ -363,7 +444,7 @@ AudioEmitter.prototype.setPlaybackRate = function (speed)
  * Get the playback speed.
  *
  * @method getPlaybackRate
- * @return {Number} Playback speed.
+ * @return {number} Playback speed.
  */
 AudioEmitter.prototype.getPlaybackRate = function()
 {
@@ -413,7 +494,7 @@ AudioEmitter.prototype.setFilters = function(value)
  * Get a filter to the filters array.
  * 
  * @method getFilter
- * @param {Number} index Index of the filter.
+ * @param {number} index Index of the filter.
  * @return Filter.
  */
 AudioEmitter.prototype.getFilter = function(index)

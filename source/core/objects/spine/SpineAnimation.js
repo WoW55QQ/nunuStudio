@@ -3,15 +3,15 @@
 /**
  * Spine animation object, to used with animation produced inside Esoteric spine.
  * 
- * Based on the official threejs runtime code available at https://github.com/EsotericSoftware/spine-runtimes.
+ * Based on the official three.js runtime code available at https://github.com/EsotericSoftware/spine-runtimes.
  * 
  * More information abou spine available here www.esotericsoftware.com.
  * 
  * @class SpineAnimation
  * @extends {spine.threejs.SkeletonMesh}
  * @param {Object} json
- * @param {String} atlas
- * @param {String} path
+ * @param {string} atlas
+ * @param {string} path
  * @param {Array} textures
  * @module Animations
  */
@@ -74,7 +74,7 @@ function SpineAnimation(json, atlas, path, textures)
 
 	this.name = "spine";
 	this.type = "SpineAnimation";
-	
+
 	this.frustumCulled = false;
 	this.receiveShadow = true;
 	this.castShadow = true;
@@ -126,7 +126,7 @@ function SpineAnimation(json, atlas, path, textures)
 	 * Index of the animation track playing.
 	 *
 	 * @attribute track
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.track = 0;
 
@@ -134,7 +134,7 @@ function SpineAnimation(json, atlas, path, textures)
 	 * Indicates the loop mode of the animation if set true the animation starts again after it ends.
 	 *
 	 * @attribute loop
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	this.loop = true;
 
@@ -145,7 +145,11 @@ function SpineAnimation(json, atlas, path, textures)
 
 SpineAnimation.prototype = Object.create(spine.threejs.SkeletonMesh.prototype);
 
-SpineAnimation.prototype.update = THREE.Object3D.prototype.update;
+SpineAnimation.prototype.update = function(delta)
+{
+	//spine.threejs.SkeletonMesh.prototype.update.call(this, delta);
+	THREE.Object3D.prototype.update.call(this);
+};
 
 /**
  * Update mesh geometry from animation state before rendering.
@@ -178,7 +182,6 @@ SpineAnimation.prototype.play = function()
 	}
 };
 
-
 /**
  * Get all available animations.
  * 
@@ -194,9 +197,9 @@ SpineAnimation.prototype.getAnimations = function()
  * Set animation from track number and name.
  * 
  * @method setAnimation
- * @param {Number} track Track number.
- * @param {String} animation Animation name.
- * @param {Boolean} loop If true the animation plays in loop.
+ * @param {number} track Track number.
+ * @param {string} animation Animation name.
+ * @param {boolean} loop If true the animation plays in loop.
  */
 SpineAnimation.prototype.setAnimation = function(track, animation, loop)
 {
@@ -231,7 +234,7 @@ SpineAnimation.prototype.getSkins = function()
  * Set skin to be used by this animation
  *
  * @method setSkin
- * @param {String} name Skin name.
+ * @param {string} name Skin name.
  */
 SpineAnimation.prototype.setSkin = function(name)
 {

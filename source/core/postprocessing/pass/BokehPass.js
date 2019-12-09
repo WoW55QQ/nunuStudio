@@ -5,9 +5,9 @@
  * 
  * @class BokehPass
  * @module Postprocessing
- * @param {Number} focus Focus distance.
- * @param {Number} aperture Camera aperture.
- * @param {Number} maxblur Maximum level of blur.
+ * @param {number} focus Focus distance.
+ * @param {number} aperture Camera aperture.
+ * @param {number} maxblur Maximum level of blur.
  */
 
 function BokehPass(focus, aperture, maxblur)
@@ -54,7 +54,7 @@ function BokehPass(focus, aperture, maxblur)
 		 * Camera aperture.
 		 *
 		 * @property aperture
-		 * @type {Number}
+		 * @type {number}
 		 */
 		aperture:
 		{
@@ -66,7 +66,7 @@ function BokehPass(focus, aperture, maxblur)
 		 * Focus point distance.
 		 *
 		 * @property focus
-		 * @type {Number}
+		 * @type {number}
 		 */
 		focus:
 		{
@@ -102,7 +102,9 @@ BokehPass.prototype.render = function(renderer, writeBuffer, readBuffer, delta, 
 	renderer.autoClear = false;
 	renderer.setClearColor(0xffffff);
 	renderer.setClearAlpha(1.0);
-	renderer.render(scene, camera, this.renderTargetDepth, true);
+	renderer.setRenderTarget(this.renderTargetDepth);
+	renderer.clear(true, true, true);
+	renderer.render(scene, camera);
 
 	//Update camera uniforms
 	this.uniforms["tColor"].value = readBuffer.texture;

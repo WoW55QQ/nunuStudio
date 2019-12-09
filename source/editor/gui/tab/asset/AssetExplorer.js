@@ -11,7 +11,6 @@ function AssetExplorer(parent, closeable, container, index)
 	//Assets
 	this.assets = new Element(this, "div");
 	this.assets.element.style.overflow = "auto";
-	this.assets.element.style.top = "20px";
 
 	//Drop event
 	this.element.ondrop = function(event)
@@ -56,12 +55,12 @@ function AssetExplorer(parent, closeable, container, index)
 	 */
 	this.search = new SearchBox(this.bar);
 	this.search.setMode(Element.TOP_RIGHT);
-	this.search.size.set(160, 20);
-	this.search.position.set(2, 0);
+	this.search.size.set(200, 25);
+	this.search.position.set(1, 0);
 	this.search.updateInterface();
 	this.search.setOnChange(function()
 	{
-		self.filterByName(this.value);
+		self.filterByName(self.search.search.getText());
 	});
 
 	/**
@@ -89,7 +88,7 @@ AssetExplorer.prototype = Object.create(TabElement.prototype);
  * Only assets that contain the name will be shown.
  *
  * @method filterByName
- * @param {String} name String with portion of the name to be found and filtered.
+ * @param {string} name String with portion of the name to be found and filtered.
  */
 AssetExplorer.prototype.filterByName = function(search)
 {
@@ -137,6 +136,13 @@ AssetExplorer.prototype.add = function(file)
 	this.files.push(file);
 };
 
+/**
+ * Update the full object view in the asset explorer.
+ *
+ * Should only be used to initialize the explorer the first time. After it gets initialized use the add and remove methods.
+ *
+ * @method updateObjectsView
+ */
 AssetExplorer.prototype.updateObjectsView = function()
 {
 	//TODO <USE ONLY TO INITIALIZE THE EXPLORER>
@@ -233,9 +239,10 @@ AssetExplorer.prototype.updateSize = function()
 {
 	Element.prototype.updateSize.call(this);
 
-	this.bar.size.set(this.size.x, 20);
+	this.bar.size.set(this.size.x, 25);
 	this.bar.updateSize();
 
+	this.assets.position.set(0, 25);
 	this.assets.size.set(this.size.x, this.size.y - 20);
-	this.assets.updateSize();
+	this.assets.updateInterface();
 };

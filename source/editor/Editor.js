@@ -3,7 +3,7 @@
 Editor.initialize = function()
 {
 	//Check WebGL Support
-	if(!Nunu.webglAvailable())
+	if(!Nunu.webGLAvailable())
 	{
 		Editor.alert(Locale.webglNotSupported);
 		Editor.exit();
@@ -309,7 +309,7 @@ Editor.selectObject = function(object)
  * 
  * @method addToSelection
  * @param {THREE.Object3D} object Object to add to selection.
- * @param {Boolean} updateClient If false does not update the management client.
+ * @param {boolean} updateClient If false does not update the management client.
  */
 Editor.addToSelection = function(object)
 {
@@ -393,7 +393,7 @@ Editor.resize = function()
  * Check if there is some object selected.
  *
  * @method hasObjectSelected
- * @return {Boolean} True if there is an object selected.
+ * @return {boolean} True if there is an object selected.
  */
 Editor.hasObjectSelected = function()
 {
@@ -451,8 +451,10 @@ Editor.getScene = function()
 };
 
 /**
- * Add objects to the actual scene, and creates an action in the editor history. 
+ * Add objects to a parent, and creates an action in the editor history. 
  * 
+ * If no parent is specified it adds to object to the current scene. 
+ *
  * @method addObject
  * @param {Object3D} object Object to be added.
  * @param {Object3D} parent Parent object, if undefined the program scene is used.
@@ -465,7 +467,7 @@ Editor.addObject = function(object, parent)
 	}
 
 	var actions = [new AddAction(object, parent)];
-	var resources = ResourceManager.searchObject(object, Editor.program);
+	var resources = ResourceUtils.searchObject(object, Editor.program);
 
 	for(var category in resources)
 	{
@@ -735,16 +737,19 @@ Editor.createDefaultResouces = function()
 	Editor.defaultAudio = new Audio(Global.FILE_PATH + "default.mp3");
 
 	Editor.defaultTexture = new Texture(Editor.defaultImage);
-	Editor.defaultTexture.name = "default";
+	Editor.defaultTexture.name = "texture";
 
 	Editor.defaultTextureParticle = new Texture(new Image(Global.FILE_PATH + "particle.png"));
 	Editor.defaultTextureParticle.name = "particle";
 
+	Editor.defaultGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
+	Editor.defaultGeometry.name = "box";
+
 	Editor.defaultMaterial = new THREE.MeshStandardMaterial({roughness: 0.6, metalness: 0.2});
-	Editor.defaultMaterial.name = "default";
+	Editor.defaultMaterial.name = "standard";
 	
 	Editor.defaultSpriteMaterial = new THREE.SpriteMaterial({map: Editor.defaultTexture, color: 0xffffff});
-	Editor.defaultSpriteMaterial.name = "default";
+	Editor.defaultSpriteMaterial.name = "sprite";
 
 	Editor.defaultTextureLensFlare = [];
 	for(var i = 0; i < 4; i++)
@@ -836,12 +841,15 @@ Editor.addDefaultScene = function(material)
 	scene.add(sky);
 
 	//Box
-	var model = new Mesh(new THREE.BoxBufferGeometry(1, 1, 1), material);
+	var model = new Mesh(Editor.defaultGeometry, material);
 	model.name = "box";
 	scene.add(model);
 
 	//Floor
-	model = new Mesh(new THREE.BoxBufferGeometry(20, 1, 20), material);
+	var ground = new THREE.BoxBufferGeometry(20, 1, 20);
+	ground.name = "ground";
+	
+	model = new Mesh(ground, material);
  	model.position.set(0, -1.0, 0);
 	model.name = "ground";
 	scene.add(model);
@@ -858,10 +866,10 @@ Editor.addDefaultScene = function(material)
  * Save program to file.
  *
  * @method saveProgram
- * @param {String} fname
- * @param {Boolean} binary If true the file is saved as nsp.
- * @param {Boolean} keepDirectory
- * @param {Boolean} supressMessage
+ * @param {string} fname
+ * @param {boolean} binary If true the file is saved as nsp.
+ * @param {boolean} keepDirectory
+ * @param {boolean} supressMessage
  */
 Editor.saveProgram = function(fname, binary, keepDirectory, suppressMessage)
 {
@@ -951,7 +959,7 @@ Editor.setProgram = function(program)
  *
  * @method loadProgram
  * @param {File} file
- * @param {Boolean} binary Indicates if the file is binary.
+ * @param {boolean} binary Indicates if the file is binary.
  */
 Editor.loadProgram = function(file, binary)
 {
@@ -1025,7 +1033,7 @@ Editor.loadProgram = function(file, binary)
  * Used for the editor to remember the file location that it is currently working on.
  *
  * @method setOpenFile
- * @param {String} file Path of file currently open.
+ * @param {string} file Path of file currently open.
  */
 Editor.setOpenFile = function(file)
 {
@@ -1060,8 +1068,8 @@ Editor.setOpenFile = function(file)
  * Show a confirm dialog with a message.
  *
  * @method confirm
- * @param {String} message
- * @return {Boolean} True or false depending on the confirm result.
+ * @param {string} message
+ * @return {boolean} True or false depending on the confirm result.
  */
 Editor.confirm = function(message)
 {
@@ -1072,7 +1080,7 @@ Editor.confirm = function(message)
  * Show a alert dialog with a message.
  *
  * @method confirm
- * @param {String} message
+ * @param {string} message
  */
 Editor.alert = function(message)
 {
@@ -1083,9 +1091,9 @@ Editor.alert = function(message)
  * Prompt the user for a value.
  *
  * @method confirm
- * @param {String} message
- * @param {String} defaultValue
- * @return {String} Value inserted by the user.
+ * @param {string} message
+ * @param {string} defaultValue
+ * @return {string} Value inserted by the user.
  */
 Editor.prompt = function(message, defaultValue)
 {
@@ -1137,6 +1145,11 @@ Editor.updateNunu = function(silent)
 			Editor.alert(Locale.updateFailed);
 		}
 	}
+};
+
+Editor.getRendererConfig = function()
+{
+	return Editor.settings.render.followProject ? Editor.program.rendererConfig : Editor.settings.render;
 };
 
 /**

@@ -9,7 +9,7 @@
  * 
  * @class Program
  * @module Core
- * @param {String} name Program name
+ * @param {string} name Program name
  * @extends {ResourceManager}
  */
 function Program(name)
@@ -32,38 +32,39 @@ function Program(name)
 
 	/**
 	 * Program name.
+	 *
 	 * @property name
-	 * @type {String}
+	 * @type {string}
 	 */
 	this.name = (name !== undefined) ? name : "program";
 
 	/**
-	 * Program description.
+	 * Program description, will be stamped when the app is exported.
 	 *
 	 * @property description
-	 * @type {String}
+	 * @type {string}
 	 */
 	this.description = "";
 
 	/**
-	 * Program author.
+	 * Program author, will be stamped when the app is exported.
 	 *
 	 * @property author
-	 * @type {String}
+	 * @type {string}
 	 */
 	this.author = "";
 
 	/**
-	 * Program version.
+	 * Program version should adhere to semantic versioning, but it is not mandatory.
 	 *
 	 * @property version
-	 * @type {String}
-	 * @default "0"
+	 * @type {string}
+	 * @default "0.0.0"
 	 */
-	this.version = "0";
+	this.version = "0.0.0";
 
 	/**
-	 * Flag to control pointer locking.
+	 * Flag to control pointer locking, when set true the cursor is locked into the application window.
 	 *
 	 * @property lockPointer
 	 * @type {boolean}
@@ -74,6 +75,8 @@ function Program(name)
 	/**
 	 * Flag to indicate if the runtime should handle device pixel ratio.
 	 *
+	 * If set false the runtime will ignore the pixel ratio, and use in browser coordinates.
+	 *
 	 * @property handlePixelRatio
 	 * @type {boolean}
 	 * @default false
@@ -81,7 +84,9 @@ function Program(name)
 	this.handlePixelRatio = false;
 
 	/**
-	 * Enable virtual reality flag.
+	 * Enable virtual reality flag, allows the application to run in VR mode.
+	 *
+	 * VR mode can only be enabled if the system and browser have support for VR.
 	 *
 	 * @property vr
 	 * @default false
@@ -95,7 +100,7 @@ function Program(name)
 	 * Indicates the relation between the real movement and virtual world movement.
 	 *
 	 * @property vrScale
-	 * @type {Number}
+	 * @type {number}
 	 * @default 1.0
 	 */
 	this.vrScale = 1.0;
@@ -107,6 +112,14 @@ function Program(name)
 	 * @type {RendererConfiguration}
 	 */
 	this.rendererConfig = new RendererConfiguration();
+
+	/**
+	 * Target related configurations applied when exporting the app.
+	 *
+	 * @property targetConfig
+	 * @type {TargetConfig}
+	 */
+	this.targetConfig = new TargetConfig();
 
 	/**
 	 * Scene loaded as default on startup.
@@ -164,7 +177,7 @@ function Program(name)
 	 * This canvas is where the WebGL rendering context was created.
 	 *
 	 * @property canvas
-	 * @type {DOM}
+	 * @type {Element}
 	 */
 	this.canvas = null;
 
@@ -174,24 +187,17 @@ function Program(name)
 	 * All content added to this division should be manually removed before the app exits.
 	 *
 	 * @property division
-	 * @type {DOM}
+	 * @type {Element}
 	 */
 	this.division = null;
 
 	/**
-	 * Event manager used to handle VR display presentation change event.
+	 * Event manager used to attach in program events.
 	 *
 	 * @property manager
 	 * @type {EventManager}
 	 */
 	this.manager = new EventManager();
-	this.manager.add(window, "vrdisplaypresentchange", function()
-	{
-		if(self.vrDisplay !== null && !self.vrDisplay.isPresenting)
-		{
-			self.vrEnabled = false;
-		}
-	});
 
 	/**
 	 * Clock object used to measure times between frames.
@@ -201,11 +207,13 @@ function Program(name)
 	 */
 	this.clock = new THREE.Clock();
 
-	//VR runtime control
-	this.vrEnabled = false;
-	this.vrDisplay = null;
-	this.vrEffect = null;
-	this.vrControls = null;
+	/**
+	 * VR runtime control, true when the app is running in VR mode.
+	 *
+	 * @property vrRunning
+	 * @type {boolean}
+	 */
+	this.vrRunning = false;
 }
 
 Program.prototype = Object.create(ResourceManager.prototype);
@@ -248,19 +256,7 @@ Program.prototype.initialize = function()
 	{
 		this.setScene(this.children[0]);
 	}
-
-	if(this.vr)
-	{
-		var self = this;
-
-		Nunu.getVRDisplays(function(display)
-		{
-			self.vrDisplay = display;
-			self.vrControls = new VRControls();
-			self.vrEffect = new VREffect(self.renderer);
-		});
-	}
-
+	
 	this.clock.start();
 };
 
@@ -322,38 +318,18 @@ Program.prototype.update = function()
  */
 Program.prototype.render = function(renderer)
 {
-	//Render as a VR application (ignores all camera parameters and effects)
-	if(this.vrEnabled)
-	{
-		for(var i = 0; i < this.scene.cameras.length; i++)
-		{
-			var camera = this.scene.cameras[i];
-			this.vrControls.update(camera);
-			this.vrEffect.render(this.scene, camera, undefined, true);
-		}
-	}
-	//Render normally
-	else
-	{
-		this.scene.render(renderer);
-	}
+	this.scene.render(renderer);
 };
 
 /**
  * Resize the current scene elements.
  * 
  * @method resize
- * @param {Number} x Width.
- * @param {Number} y Height.
+ * @param {number} x Width.
+ * @param {number} y Height.
  */
 Program.prototype.resize = function(x, y)
 {
-	//Resize vr effect
-	if(this.vrEffect !== null)
-	{
-		this.vrEffect.setSize(x, y);
-	}
-
 	//Resize the default camera
 	if(this.defaultCamera !== null)
 	{
@@ -382,31 +358,31 @@ Program.prototype.updateRenderer = function()
 	}
 };
 
+
+/**
+ * Check if virtual reality is available. 
+ * 
+ * @method vrAvailable
+ */
+Program.prototype.vrAvailable = function()
+{
+	return this.vr && Nunu.vrAvailable();
+};
+
 /**
  * Enter virtual reality mode.
- *
- * To enter virtual reality mode a WebVR enabled browser is required.
- *
- * When displaying VR content the display.requestAnimationFrame should be used to call the render method.
  * 
- * @method displayVR
+ * @method enterVR
  */
-Program.prototype.displayVR = function()
+Program.prototype.enterVR = function()
 {
 	if(this.vr)
 	{
-		try
+		var self = this;
+		Nunu.enterVR(this.renderer, function()
 		{
-			if(!this.vrDisplay.isPresenting)
-			{
-				this.vrDisplay.requestPresent([{source : this.canvas}]);
-				this.vrEnabled = true;
-			}
-		}
-		catch(e)
-		{
-			console.warn("nunuStudio: Failed to enter in VR mode", e);
-		}		
+			self.vrRunning = true;
+		});
 	}
 };
 
@@ -417,10 +393,10 @@ Program.prototype.displayVR = function()
  */
 Program.prototype.exitVR = function()
 {
-	if(this.vrDisplay.isPresenting)
+	if(this.vr)
 	{
-		this.vrDisplay.exitPresent();
-		this.vrEnabled = false;
+		Nunu.exitVR(this.renderer);
+		this.vrRunning = false;
 	}
 };
 
@@ -542,7 +518,7 @@ Program.prototype.clone = function()
  * This method is used by the editor.
  * 
  * @method setInitialScene
- * @param {String} uuid Scene uuid
+ * @param {string} uuid Scene uuid
  */
 Program.prototype.setInitialScene = function(scene)
 {
@@ -559,11 +535,6 @@ Program.prototype.setInitialScene = function(scene)
 Program.prototype.dispose = function()
 {
 	this.manager.destroy();
-
-	if(this.vrEffect !== null)
-	{
-		this.vrEffect.dispose();
-	}
 
 	if(this.scene !== null)
 	{

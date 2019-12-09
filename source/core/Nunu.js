@@ -1,12 +1,9 @@
 "use strict";
 
 /**
- * nunuStudio
- * MIT license (http://opensource.org/licenses/MIT)
+ * nunuStudio core main file.
  *   
- * Class used to store nunuStudio development version and timestamp.
- *
- * Contains methods to check browser feature support.
+ * Store nunuStudio development version and timestamp and contains global method to check browser feature support.
  * 
  * @class Nunu
  * @module Runtime
@@ -17,7 +14,7 @@ function Nunu(){}
  * nunuStudio
  * 
  * @attribute NAME
- * @type {String}
+ * @type {string}
  * @default "nunuStudio"
  */
 Nunu.NAME = "nunuStudio";
@@ -26,7 +23,7 @@ Nunu.NAME = "nunuStudio";
  * Stores the nunu runtime version.
  * 
  * @attribute VERSION
- * @type {String}
+ * @type {string}
  */
 Nunu.VERSION = "<PLACEHOLDER_VERSION>";
 
@@ -34,7 +31,7 @@ Nunu.VERSION = "<PLACEHOLDER_VERSION>";
  * Stores the nunu runtime dev timestamp.
  * 
  * @attribute TIMESTAMP
- * @type {String}
+ * @type {string}
  */
 Nunu.TIMESTAMP = "<PLACEHOLDER_TIMESTAMP>";
 
@@ -43,7 +40,7 @@ Nunu.TIMESTAMP = "<PLACEHOLDER_TIMESTAMP>";
  * 
  * @static
  * @attribute REPOSITORY_BRANCH
- * @type {String}
+ * @type {string}
  */
 Nunu.REPOSITORY_BRANCH = "<PLACEHOLDER_REPOSITORY_BRANCH>";
 
@@ -52,7 +49,7 @@ Nunu.REPOSITORY_BRANCH = "<PLACEHOLDER_REPOSITORY_BRANCH>";
  * 
  * @static
  * @attribute REPOSITORY_COMMIT
- * @type {String}
+ * @type {string}
  */
 Nunu.REPOSITORY_COMMIT = "<PLACEHOLDER_REPOSITORY_COMMIT>";
 
@@ -61,7 +58,7 @@ Nunu.REPOSITORY_COMMIT = "<PLACEHOLDER_REPOSITORY_COMMIT>";
  *
  * @static
  * @attribute NWJS
- * @type {Number}
+ * @type {number}
  */
 Nunu.NWJS = 200;
 
@@ -70,7 +67,7 @@ Nunu.NWJS = 200;
  *
  * @static
  * @attribute BROWSER
- * @type {Number}
+ * @type {number}
  */
 Nunu.BROWSER = 201;
 
@@ -79,7 +76,7 @@ Nunu.BROWSER = 201;
  *
  * @static
  * @attribute CORDOVA
- * @type {Number}
+ * @type {number}
  */
 Nunu.CORDOVA = 202;
 
@@ -95,41 +92,232 @@ Nunu.developmentMode = function()
 };
 
 /**
- * Check if host supports WebVR and if there is a VR display available.
- * 
- * @method webvrAvailable
- * @return {boolean} True is WebVR is available.
+ * Check if there is any VR API available, on the device.
+ *
+ * Checks if there is support for WebVR or WebXR.
+ *
+ * @method vrAvailable
+ * @return {boolean} True if the browser supports vr.
  */
-Nunu.webvrAvailable = function()
+Nunu.vrAvailable = function()
 {
-	return navigator.getVRDisplays !== undefined;
+	return Nunu.webVRAvailable() || Nunu.webXRAvailable();
 };
 
 /**
- * Used to get the first VR display available, the display is returned as argument of the getDisplay function.
- * 
- * @method getVRDisplays
- * @param {Function} getDisplay Function used to get the display, receives the display as argument.
+ * Enter virtual reality mode using WebXR or WebVR depending on the API available.
+ *
+ * If booth API are available the WebXR API is used.
+ *
+ * When displaying VR content the display.requestAnimationFrame should be used to call the render method.
+ *
+ * @method enterVR
+ * @param {THREE.WebGLRenderer} renderer Renderer used to draw the scene.
+ * @param {Function} onSuccess Method called if the application entered VR successfully.
  */
-Nunu.getVRDisplays = function(getDisplay)
+Nunu.enterVR = function(renderer, onSuccess)
 {
-	if(navigator.getVRDisplays === undefined)
+	if(Nunu.webXRAvailable())
 	{
-		console.warn("nunuStudio: WebVR is not supported.");
+		Nunu.getXRSession(function(session)
+		{
+			renderer.vr.enabled = true;
+			renderer.vr.setSession(session);
+
+			if(onSuccess !== undefined)
+			{
+				onSuccess();
+			}
+		});
+	}
+	else if(Nunu.webVRAvailable())
+	{
+		Nunu.getVRDisplay(function(display)
+		{
+			if(!display.isPresenting)
+			{
+				renderer.vr.enabled = true;
+				renderer.vr.setDevice(display);
+				display.requestPresent([{source : renderer.domElement}]);
+				
+				if(onSuccess !== undefined)
+				{
+					onSuccess();
+				}
+			}
+		});
+	}
+	else
+	{
+		console.warn("nunuStudio: VR support is not available.");
+	}
+};
+
+/**
+ * Enter virtual reality mode, if the application is not running on VR mode does not do anything.
+ *
+ * @method exitVR
+ * @param {THREE.WebGLRenderer} renderer Renderer used to draw the scene.
+ */
+Nunu.exitVR = function(renderer)
+{
+	if(Nunu.webXRAvailable())
+	{
+		Nunu.getXRSession(function(session)
+		{
+			renderer.vr.enabled = false;
+			renderer.vr.setSession(null);
+		});
+	}
+	else if(Nunu.webVRAvailable())
+	{
+		Nunu.getVRDisplay(function(display)
+		{
+			if(display.isPresenting)
+			{
+				renderer.vr.enabled = false;
+				renderer.vr.setDevice(null);
+				device.exitPresent();
+			}
+		});
+	}
+};
+
+/**
+ * WebXR session created.
+ *
+ * @attribute webXRSession
+ * @type {XRSession}
+ */
+Nunu.webXRSession = null;
+
+/**
+ * Flag checking if there is support for XR immersive VR mode.
+ *
+ * Checked on the library startup if XR is supported, while the check does not finish it is set to null.
+ *
+ * @attribute webXRSupported
+ * @type {boolean}
+ */
+Nunu.webXRSupported = null;
+
+if(navigator.xr !== undefined && navigator.xr.isSessionSupported !== undefined)
+{
+	navigator.xr.isSessionSupported("immersive-vr").then(function(supported)
+	{
+		Nunu.webXRSupported = supported;
+	});
+}
+
+/**
+ * Check if host supports WebXR.
+ * 
+ * @method webXRAvailable
+ * @return {boolean} True is WebVR is available.
+ */
+Nunu.webXRAvailable = function()
+{
+	return navigator.xr !== undefined && navigator.xr.isSessionSupported !== undefined && Nunu.webXRSupported !== false;
+};
+
+/**
+ * Get WebXR session.
+ *
+ * @method getXRSession
+ * @param {Function} onSession Function used to get the XR session, receives the session as argument.
+ */
+Nunu.getXRSession = function(onSession)
+{
+	if(!Nunu.webXRAvailable())
+	{
+		console.warn("nunuStudio: WebXR support is not available.");
 		return;
 	}
 
+	if(Nunu.webXRSession !== null)
+	{
+		onSession(Nunu.webXRSession);
+	}
+	else
+	{	
+		navigator.xr.requestSession("immersive-vr",{optionalFeatures: ["local-floor", "bounded-floor"]}).then(function(session)
+		{
+			Nunu.webXRSession = session;
+			onSession(session);
+		});
+	}
+}
+
+/**
+ * Web VR display obtained.
+ *
+ * @attribute webVRDisplay
+ * @type {VRDisplay}
+ */
+Nunu.webVRDisplay = null;
+
+/**
+ * Flag indicating if there are any VR displays available.
+ *
+ * Checked on the library bootup if WebVR is available, while the check does not finish it is set to null.
+ *
+ * @attribute webVRHasDisplay
+ * @type {boolean}
+ */
+Nunu.webVRHasDisplay = null;
+
+if(navigator.getVRDisplays !== undefined)
+{
 	navigator.getVRDisplays().then(function(displays)
 	{
-		if(displays.length > 0)
-		{
-			getDisplay(displays[0]);
-		}
-		else
-		{
-			console.warn("nunuStudio: WebVR supported but no display is available.");
-		}
+		Nunu.webVRHasDisplay = displays.length > 0;
 	});
+}
+
+/**
+ * Check if host supports WebVR.
+ * 
+ * @method webVRAvailable
+ * @return {boolean} True is WebVR is available.
+ */
+Nunu.webVRAvailable = function()
+{
+	return navigator.getVRDisplays !== undefined && Nunu.webVRHasDisplay !== false;
+};
+
+/**
+ * Used to get the first VR display available, the display is returned as argument of the onDisplay function.
+ * 
+ * @method getVRDisplays
+ * @param {Function} onDisplay Function used to get the display, receives the display as argument.
+ */
+Nunu.getVRDisplay = function(onDisplay)
+{
+	if(!Nunu.webVRAvailable())
+	{
+		console.warn("nunuStudio: WebVR support is not available.");
+		return;
+	}
+
+	if(Nunu.webVRDisplay !== null)
+	{
+		onDisplay(Nunu.webVRDisplay);
+	}
+	else
+	{
+		navigator.getVRDisplays().then(function(displays)
+		{
+			if(displays.length > 0)
+			{
+				Nunu.webVRDisplay = displays[0];
+				onDisplay(displays[0]);
+			}
+			else
+			{
+				console.warn("nunuStudio: WebVR supported but no display is available.");
+			}
+		});
+	}
 };
 
 /**
@@ -163,7 +351,7 @@ Nunu.getQueryParameters = function()
  * Uses a blob to inject the code and loads it from and URL object.
  *
  * @method createWorker
- * @param {String} code Javascript code for this worker.
+ * @param {string} code Javascript code for this worker.
  * @param {Function} onMessage On message worker callback.
  * @return {Worker} Returns a worker instance (for comunication).
  */
@@ -197,7 +385,7 @@ Nunu.webAudioAvailable = function()
  * @method webglAvailable
  * @return {boolean} True if WebGL is available.
  */
-Nunu.webglAvailable = function()
+Nunu.webGLAvailable = function()
 {
 	try
 	{
@@ -223,7 +411,7 @@ Nunu.webglAvailable = function()
  *    - Nunu.CORDOVA
  *
  * @method getPlatform
- * @return {Number} Indicates the platform type.
+ * @return {number} Indicates the platform type.
  */
 Nunu.getPlatform = function()
 {
@@ -293,7 +481,7 @@ Nunu.isFullscreen = function()
  * 
  * @method setFullscreen
  * @param {boolean} fullscreen If true the application will enter fullscreen mode, if false it will exit, if undefine it will toggle the value.
- * @param {DOM} element DOM element to put into fullscreen.
+ * @param {Element} element DOM element to put into fullscreen.
  */
 Nunu.setFullscreen = function(fullscreen, element)
 {

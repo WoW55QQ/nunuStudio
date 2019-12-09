@@ -7,14 +7,14 @@
  *
  * @class TweenAnimation
  * @param {Object} object Object that contains the attribute.
- * @param {String} attribute Name of the attribute.
+ * @param {string} attribute Name of the attribute.
  * @param {Object} target Final target value.
- * @param {Number} time Time of the animation in milliseconds.
+ * @param {number} time Time of the animation in milliseconds.
  * @param {Function} onUpdate Callback function that runs after updating the value.
  */
 function TweenAnimation(object, attribute, target, time, onUpdate)
 {
-	var isVectorial = ValidationUtils.isVetorial(object[attribute]);
+	var isVectorial = TweenAnimation.isVetorial(object[attribute]);
 
 	var self = this;
 
@@ -30,7 +30,7 @@ function TweenAnimation(object, attribute, target, time, onUpdate)
 	 * Name of the attribute.
 	 *
 	 * @attribute attribute
-	 * @type {String}
+	 * @type {string}
 	 */
 	this.attribute = attribute;
 
@@ -54,7 +54,7 @@ function TweenAnimation(object, attribute, target, time, onUpdate)
 	 * Animation duration in milliseconds.
 	 *
 	 * @attribute time
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.time = time;
 
@@ -92,6 +92,28 @@ function TweenAnimation(object, attribute, target, time, onUpdate)
 		}
 	});
 }
+
+/**
+ * Check if a attribute is a THREE vectorial data type.
+ * 
+ * Vetorial types have some common methods (toArray, copy, fromArray).
+ *
+ * (Matrix3, Matrix4, Vector2, Vector3, Vector4, Quaternion, Euler).
+ * 
+ * @method isVetorial
+ * @param {Object} object To be checked.
+ * @return {boolean} True if the object is of a vectorial type.
+ */
+TweenAnimation.isVetorial = function(object)
+{
+	if(object === null || object === undefined)
+	{
+		return false;
+	}
+	
+	return object.isVector3 === true || object.isEuler === true || (object instanceof THREE.Quaternion) || object.isVector2 === true || object.isVector4 === true || object.isMatrix3 === true || object.isMatrix4 === true;
+};
+
 
 /**
  * Set an on complete callback function, that is executed when the animation finishes.

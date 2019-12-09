@@ -62,7 +62,7 @@ TextArea.prototype = Object.create(Element.prototype);
  *
  * @static
  * @attribute SOFT
- * @type {String}
+ * @type {string}
  */
 TextArea.SOFT = "soft";
 
@@ -73,7 +73,7 @@ TextArea.SOFT = "soft";
  *
  * @static
  * @attribute HARD
- * @type {String}
+ * @type {string}
  */
 TextArea.HARD = "hard";
 
@@ -83,9 +83,9 @@ TextArea.HARD = "hard";
  * May also affect some types of children components. 
  * 
  * @method setFont
- * @param {String} fontFamily Font family.
- * @param {Number} fontWeight Font weigth, sets how thick or thin characters in text should be displayed.
- * @param {String} fontStyle Font style, specifies the font style for a text.
+ * @param {string} fontFamily Font family.
+ * @param {number} fontWeight Font weigth, sets how thick or thin characters in text should be displayed.
+ * @param {string} fontStyle Font style, specifies the font style for a text.
  */
 TextArea.prototype.setFont = function(fontFamily, fontWeight, fontStyle)
 {
@@ -108,7 +108,7 @@ TextArea.prototype.setFont = function(fontFamily, fontWeight, fontStyle)
  * Only affects the value on form submission.
  *
  * @method setWrap
- * @param {String} mode The wrap mode to use.
+ * @param {string} mode The wrap mode to use.
  */
 TextArea.prototype.setWrap = function(mode)
 {
@@ -119,11 +119,48 @@ TextArea.prototype.setWrap = function(mode)
  * Set the disabled state of the element.
  *
  * @method setDisabled
- * @param {Boolean} disabled
+ * @param {boolean} disabled
  */
 TextArea.prototype.setDisabled = function(value)
 {
 	this.element.disabled = value;
+};
+
+/**
+ * Set oninput callback called after every letter typed into the box.
+ *
+ * Should be used only for immediate input effect, or can be used with a timeout value to prevent high CPU usage.
+ *
+ * @method setOnInput
+ * @param {Function} onInput Callback method called everytime the user types something.
+ * @param {number} timeout Time (ms) after the user stopped typing to activate the callback.
+ */
+TextArea.prototype.setOnInput = function(onInput, timeout)
+{
+	if(timeout !== undefined)
+	{
+		var timer = null;
+		var self = this;
+
+		this.element.oninput = function(event)
+		{
+			if(timer !== null)
+			{
+				clearTimeout(timer);
+				timer = null;
+			}
+
+			timer = setTimeout(function()
+			{
+				onInput();
+				timer = null;
+			}, timeout)
+		};
+	}
+	else
+	{
+		this.element.oninput = onInput;
+	}
 };
 
 /**
@@ -152,7 +189,7 @@ TextArea.prototype.setText = function(text)
  * Get text stored in the input element.
  *
  * @method getText
- * @return {String} Text stored in the input element.
+ * @return {string} Text stored in the input element.
  */
 TextArea.prototype.getText = function()
 {
@@ -171,6 +208,6 @@ TextArea.prototype.setValue = TextArea.prototype.setText;
  * Get text stored in the input element. Same as getText().
  *
  * @method getValue
- * @return {String} Text stored in the input element.
+ * @return {string} Text stored in the input element.
  */
 TextArea.prototype.getValue = TextArea.prototype.getText;
