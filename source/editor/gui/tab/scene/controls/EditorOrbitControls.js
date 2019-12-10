@@ -194,7 +194,7 @@ EditorOrbitControls.prototype.update = function(mouse, keyboard)
 {
 	this.needsUpdate = false;
 
-	if(mouse.buttonPressed(Mouse.LEFT))
+	if(keyboard.keyPressed(Keyboard.ALT) && mouse.buttonPressed(Mouse.LEFT))
 	{
 		if(this.smooth === true)
 		{
